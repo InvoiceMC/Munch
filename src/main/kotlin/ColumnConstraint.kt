@@ -4,5 +4,5 @@ enum class ColumnConstraint {
     NOTNULL,
     UNIQUE,
     CHECK,
-    DEFAULT,
+    FOREIGN,
 }

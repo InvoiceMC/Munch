@@ -1,8 +1,9 @@
 package me.outspending
 
 import kotlin.reflect.KClass
+import kotlin.reflect.KProperty1
 
-interface Munch<T> {
+interface Munch<T : Any> {
     companion object {
         fun <T : Any> create(clazz: KClass<T>): Munch<T> {
             return MunchImpl(clazz)
@@ -11,6 +12,6 @@ interface Munch<T> {
 
     fun process(): MunchClass<T>
     fun isSQLType(): Boolean
-    fun hasPrimaryKey(): Boolean
     fun getClass(): KClass<T>
+    fun getProperties(): Collection<KProperty1<out T, *>>
 }
