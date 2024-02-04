@@ -19,3 +19,6 @@ V
 &src/main/kotlin/generator/Generator.kt,6\2\627758f9489f1bd626b5b05450e67c9450c9451e
 ]
 -src/main/kotlin/connection/MunchConnection.kt,7\0\707afacd17011ac2184b377ea33152337314af4b
+:
+
+.gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
