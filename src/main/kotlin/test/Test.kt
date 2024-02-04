@@ -13,11 +13,13 @@ import me.outspending.enums.ColumnType
  */
 @Table
 data class Test(
-    @PrimaryKey(type = ColumnType.INTEGER, autoIncrement = true) val id: Int,
-    @Column(type = ColumnType.TEXT, constraints = [ColumnConstraint.NOTNULL]) val name: String,
+    @PrimaryKey(type = ColumnType.INTEGER, autoIncrement = true) var id: Int,
+    @Column(type = ColumnType.TEXT, constraints = [ColumnConstraint.NOTNULL]) var name: String,
     @Column(
         type = ColumnType.INTEGER,
         constraints = [ColumnConstraint.NOTNULL, ColumnConstraint.UNIQUE]
     )
-    val age: Int
-)
+    var age: Int
+) {
+    constructor() : this(0, "", 0)
+}

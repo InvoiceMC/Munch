@@ -33,7 +33,7 @@ interface Serializer<T> {
      * @author Outspending
      * @since 1.0.0
      */
-    fun serialize(obj: T): String
+    fun serialize(obj: Any?): String
 
     /**
      * This method is used to deserialize a string.
