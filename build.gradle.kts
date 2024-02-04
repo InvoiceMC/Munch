@@ -12,7 +12,8 @@ repositories {
 
 dependencies {
     implementation(kotlin("reflect"))
-
+    implementation("org.xerial:sqlite-jdbc:3.45.1.0")
+    
     // JMH
     jmh("org.openjdk.jmh:jmh-core:0.9")
     jmh("org.openjdk.jmh:jmh-generator-annprocess:0.9")
