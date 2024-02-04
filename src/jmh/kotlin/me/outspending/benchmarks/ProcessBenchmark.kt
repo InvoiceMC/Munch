@@ -1,6 +1,7 @@
 package me.outspending.benchmarks
 
 import me.outspending.Munch
+import me.outspending.test.Test
 import org.openjdk.jmh.annotations.*
 
 @BenchmarkMode(Mode.AverageTime)

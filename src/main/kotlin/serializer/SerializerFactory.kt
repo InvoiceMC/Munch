@@ -90,7 +90,7 @@ object SerializerFactory {
      * @author Outspending
      */
     private fun <T> registerSerializer(serializer: Serializer<T>) {
-        val clazz = serializer.getClass()
+        val clazz = serializer.getSerializerClass()
         require(clazz !in serializers) { "Serializer for class ${clazz.name} already exists" }
 
         serializers[clazz] = serializer

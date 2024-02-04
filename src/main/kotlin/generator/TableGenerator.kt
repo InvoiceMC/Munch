@@ -3,6 +3,9 @@ package me.outspending.generator
 import kotlin.reflect.KProperty1
 import me.outspending.Column
 import me.outspending.MunchClass
+import me.outspending.generator.types.ColumnGenerator
+import me.outspending.generator.types.Generator
+import me.outspending.generator.types.PrimaryGenerator
 
 /**
  * This extension function is used to generate the SQL for the data class.
@@ -12,36 +15,38 @@ import me.outspending.MunchClass
  */
 fun <T : Any> MunchClass<T>.generateTable(): String = generateCustom(TableGenerator(this))
 
-class TableGenerator<T : Any>(private val clazz: MunchClass<T>) : Generator<T> {
+class TableGenerator<T : Any>(clazz: MunchClass<T>) :
+    Generator<T>, PrimaryGenerator<T>, ColumnGenerator<T> {
     private val builder = StringBuilder("CREATE TABLE IF NOT EXISTS ${clazz.clazz.simpleName} (")
+
+    private val primaryKey = clazz.primaryKey
+    private val columns = clazz.columns
 
     override fun generate(): String {
         handlePrimaryKey()
         handleColumns()
-        builder.append(")")
+
+        builder.append(");")
+
         return builder.toString()
     }
 
     override fun handlePrimaryKey() {
-        clazz.primaryKey?.let { (property, primaryKey) ->
+        primaryKey?.let { (property, primaryKey) ->
             val hasAutoIncrement = primaryKey.autoIncrement
-
-            if (hasAutoIncrement && property.returnType.classifier != Int::class) {
-                throw IllegalArgumentException("Auto increment can only be used on an int type")
+            require(!(hasAutoIncrement && property.returnType.classifier != Int::class)) {
+                "Auto increment can only be used on an int type!"
             }
 
             val type = primaryKey.type.value
-
-            builder.apply {
-                append(
-                    "${property.name} $type PRIMARY KEY${if (hasAutoIncrement) " AUTOINCREMENT" else ""}"
-                )
-            }
+            builder.append(
+                "${property.name} $type PRIMARY KEY${if (hasAutoIncrement) " AUTOINCREMENT" else ""}"
+            )
         }
     }
 
     override fun handleColumns() {
-        clazz.columns?.forEach { (property, column) -> handleColumn(property, column) }
+        columns?.forEach { (property, column) -> handleColumn(property, column) }
     }
 
     override fun handleColumn(property: KProperty1<out T, *>, column: Column) {

@@ -21,7 +21,7 @@ interface Serializer<T> {
      * @since 1.0.0
      * @since 1.0.0
      */
-    fun getClass(): Class<T>
+    fun getSerializerClass(): Class<T>
 
     /**
      * This method is used to serialize an object.

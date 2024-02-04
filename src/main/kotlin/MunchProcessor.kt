@@ -1,6 +1,6 @@
 package me.outspending
 
-import me.outspending.generator.Generator
+import me.outspending.generator.types.Generator
 import kotlin.reflect.KProperty1
 
 /**

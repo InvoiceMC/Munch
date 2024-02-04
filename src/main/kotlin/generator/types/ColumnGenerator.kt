@@ -1,39 +1,10 @@
-package me.outspending.generator
+package me.outspending.generator.types
 
 import me.outspending.Column
 import me.outspending.MunchClass
-import me.outspending.PrimaryKey
 import kotlin.reflect.KProperty1
 
-/**
- * This class defines the interface for all generators to implement. This class is used to generate
- * the SQL for the data class.
- *
- * @author Outspending
- * @since 1.0.0
- */
-interface Generator<T> {
-
-    /**
-     * This method is used to generate the SQL for the data class.
-     *
-     * @author Outspending
-     * @since 1.0.0
-     */
-    fun generate(): String
-
-    /**
-     * This method is to handle the [PrimaryKey] annotation. Which is passed in to the [MunchClass]
-     * instance.
-     *
-     * If you need a reference to the primary key, you can use the [TableGenerator.handlePrimaryKey]
-     * property.
-     *
-     * @author Outspending
-     * @since 1.0.0
-     */
-    fun handlePrimaryKey()
-
+interface ColumnGenerator<T : Any> {
     /**
      * This method is to handle the columns of the data class. Which is passed in to the
      * [MunchClass] instance.

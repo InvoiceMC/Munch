@@ -1,8 +1,8 @@
 package me.outspending
 
-import me.outspending.generator.Generator
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
+import me.outspending.generator.types.Generator
 
 /**
  * This class is the main entry point for this library. It is basically a wrapper around the
@@ -44,7 +44,17 @@ class MunchClass<T : Any>(
      * This method is used to get the name of the data class.
      *
      * @return The name of the data class.
+     * @author Outspending
      * @since 1.0.0
      */
     fun getName() = clazz.simpleName
+
+    /**
+     * This method is used to get the number of values in the data class.
+     *
+     * @return The number of columns in the data class.
+     * @author Outspending
+     * @since 1.0.0
+     */
+    fun getAmount(): Int = if (primaryKey != null && columns != null) columns.size + 1 else 0
 }
