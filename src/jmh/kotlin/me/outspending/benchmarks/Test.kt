@@ -1,4 +1,4 @@
-package me.outspending.testing
+package me.outspending.benchmarks
 
 import me.outspending.*
 import me.outspending.enums.ColumnConstraint
