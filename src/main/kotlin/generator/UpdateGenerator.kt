@@ -14,9 +14,10 @@ import me.outspending.generator.types.PrimaryGenerator
  * @return The SQL for the data class.
  * @since 1.0.0
  */
-fun <T : Any> MunchClass<T>.generateUpdate(): String = generateCustom(UpdateGenerator(this))
+fun <T : Any, K : Any> MunchClass<T, K>.generateUpdate(): String =
+    generateCustom(UpdateGenerator(this))
 
-class UpdateGenerator<T : Any>(clazz: MunchClass<T>) :
+class UpdateGenerator<T : Any, K : Any>(clazz: MunchClass<T, K>) :
     Generator<T>, PrimaryGenerator<T>, ColumnGenerator<T> {
     private val builder = StringBuilder("UPDATE ${clazz.getName()} SET ")
 

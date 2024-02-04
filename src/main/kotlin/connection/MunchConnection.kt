@@ -75,7 +75,7 @@ class MunchConnection {
      * @param clazz The [MunchClass] instance to be used.
      * @since 1.0.0
      */
-    fun <T : Any> createTable(clazz: MunchClass<T>) {
+    fun <T : Any, K : Any> createTable(clazz: MunchClass<T, K>) {
         val sql = clazz.generateTable()
 
         try {
@@ -95,7 +95,7 @@ class MunchConnection {
      * @author Outspending
      * @since 1.0.0
      */
-    fun <T : Any> getAllData(clazz: MunchClass<T>): ResultSet? {
+    fun <T : Any, K : Any> getAllData(clazz: MunchClass<T, K>): ResultSet? {
         val sql = clazz.generateSelectAll()
 
         try {
@@ -109,7 +109,7 @@ class MunchConnection {
         return null
     }
 
-    fun <T : Any> hasData(clazz: MunchClass<T>, value: Any): Boolean {
+    fun <T : Any, K : Any> hasData(clazz: MunchClass<T, K>, value: K): Boolean {
         val sql = clazz.generateSelect()
 
         try {
@@ -125,7 +125,7 @@ class MunchConnection {
         return false
     }
 
-    fun <T : Any> addData(clazz: MunchClass<T>, obj: T) {
+    fun <T : Any, K : Any> addData(clazz: MunchClass<T, K>, obj: T) {
         val sql = clazz.generateInsert()
 
         try {
@@ -168,7 +168,7 @@ class MunchConnection {
      * @since 1.0.0
      */
     @Suppress("UNCHECKED_CAST")
-    fun <T : Any> getData(clazz: MunchClass<T>, value: Any): T? {
+    fun <T : Any, K : Any> getData(clazz: MunchClass<T, K>, value: K): T? {
         val sql = clazz.generateSelect()
 
         try {

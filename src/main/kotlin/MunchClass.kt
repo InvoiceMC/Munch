@@ -26,8 +26,9 @@ import me.outspending.generator.types.Generator
  * @author Outspending
  * @since 1.0.0
  */
-class MunchClass<T : Any>(
+class MunchClass<T : Any, K : Any>(
     val clazz: KClass<T>,
+    val primaryKeyClass: KClass<K>,
     val primaryKey: Pair<KProperty1<out T, *>, PrimaryKey>?,
     val columns: Map<KProperty1<out T, *>, Column>?
 ) {

@@ -13,9 +13,10 @@ import me.outspending.generator.types.PrimaryGenerator
  * @author Outspending
  * @since 1.0.0
  */
-fun <T : Any> MunchClass<T>.generateInsert(): String = generateCustom(InsertGenerator(this))
+fun <T : Any, K : Any> MunchClass<T, K>.generateInsert(): String =
+    generateCustom(InsertGenerator(this))
 
-class InsertGenerator<T : Any>(clazz: MunchClass<T>) :
+class InsertGenerator<T : Any, K : Any>(clazz: MunchClass<T, K>) :
     Generator<T>, PrimaryGenerator<T>, ColumnGenerator<T> {
     private val builder = StringBuilder("INSERT INTO ${clazz.getName()} (")
 

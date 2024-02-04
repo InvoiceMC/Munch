@@ -13,9 +13,10 @@ import me.outspending.generator.types.PrimaryGenerator
  * @author Outspending
  * @since 1.0.0
  */
-fun <T : Any> MunchClass<T>.generateTable(): String = generateCustom(TableGenerator(this))
+fun <T : Any, K : Any> MunchClass<T, K>.generateTable(): String =
+    generateCustom(TableGenerator(this))
 
-class TableGenerator<T : Any>(clazz: MunchClass<T>) :
+class TableGenerator<T : Any, K : Any>(clazz: MunchClass<T, K>) :
     Generator<T>, PrimaryGenerator<T>, ColumnGenerator<T> {
     private val builder = StringBuilder("CREATE TABLE IF NOT EXISTS ${clazz.clazz.simpleName} (")
 

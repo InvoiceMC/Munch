@@ -1,6 +1,7 @@
 package me.outspending
 
 import me.outspending.generator.types.Generator
+import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 
 /**
@@ -19,19 +20,6 @@ import kotlin.reflect.KProperty1
  * @since 1.0
  */
 class MunchProcessor<T : Any>(val munch: Munch<T>) {
-    companion object {
-        /**
-         * This method is used to create a new [MunchProcessor] instance.
-         *
-         * @param munch The [Munch] instance to be used.
-         * @return A new [MunchProcessor] instance.
-         * @author Outspending
-         * @since 1.0
-         */
-        fun <T : Any> create(munch: Munch<T>): MunchProcessor<T> {
-            return MunchProcessor(munch)
-        }
-    }
 
     /**
      * This method is used to process a [Munch] instance aka a data class that has the [Table]
@@ -47,11 +35,13 @@ class MunchProcessor<T : Any>(val munch: Munch<T>) {
      * @author Outspending
      * @since 1.0
      */
-    fun process(): MunchClass<T> {
+    @Suppress("UNCHECKED_CAST")
+    fun <K : Any> process(): MunchClass<T, K> {
         val primaryKey = getPrimaryKey()
         val columns = getColumns()
 
-        return MunchClass(munch.getClass(), primaryKey, columns)
+        val primaryKeyClass = primaryKey?.first?.returnType?.classifier as KClass<K>
+        return MunchClass(munch.getClass(), primaryKeyClass, primaryKey, columns)
     }
 
     /**

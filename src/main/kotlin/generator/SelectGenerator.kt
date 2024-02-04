@@ -11,9 +11,11 @@ import me.outspending.generator.types.PrimaryGenerator
  * @return The SQL for the data class.
  * @since 1.0.0
  */
-fun <T : Any> MunchClass<T>.generateSelect(): String = generateCustom(SelectGenerator(this))
+fun <T : Any, K : Any> MunchClass<T, K>.generateSelect(): String =
+    generateCustom(SelectGenerator(this))
 
-class SelectGenerator<T : Any>(clazz: MunchClass<T>) : Generator<T>, PrimaryGenerator<T> {
+class SelectGenerator<T : Any, K : Any>(clazz: MunchClass<T, K>) :
+    Generator<T>, PrimaryGenerator<T> {
     private val builder = StringBuilder("SELECT * FROM ${clazz.getName()} WHERE ")
 
     private val primaryKey = clazz.primaryKey

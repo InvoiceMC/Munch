@@ -36,3 +36,5 @@ _
 /src/main/kotlin/generator/SelectAllGenerator.kt,1\6\168328e66352ec1af339f94dea3a2cf7fdac70c2
 L
 src/main/kotlin/test/Test.kt,b\0\b086dc9bcb4af7f4b7852d87de84727280be9bd8
+Q
+!src/main/kotlin/MunchProcessor.kt,0\0\006eb4f76b1659e2e30ce5bb33868a93659171f0

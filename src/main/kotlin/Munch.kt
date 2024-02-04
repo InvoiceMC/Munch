@@ -30,20 +30,7 @@ import me.outspending.generator.types.Generator
  * @author Outspending
  */
 class Munch<T : Any>(private val clazz: KClass<T>) {
-    private val munchProcessor: MunchProcessor<T> = MunchProcessor.create(this)
-
-    companion object {
-        /**
-         * This method is used to create a new [Munch] instance.
-         *
-         * @param clazz The data class to be used.
-         * @return A new [Munch] instance.
-         * @since 1.0.0
-         */
-        fun <T : Any> create(clazz: KClass<T>): Munch<T> {
-            return Munch(clazz)
-        }
-    }
+    private val munchProcessor: MunchProcessor<T> = MunchProcessor(this)
 
     /**
      * This method is used to process a [Munch] instance aka a data class that has the [Table] annotation.
@@ -57,7 +44,7 @@ class Munch<T : Any>(private val clazz: KClass<T>) {
      * @see Generator
      * @since 1.0.0
      */
-    fun process(): MunchClass<T> {
+    fun <K : Any> process(): MunchClass<T, K> {
         if (isSQLType() && clazz.isData) return munchProcessor.process()
         else throw IllegalArgumentException("The class must be a data class and have the Table annotation")
     }
