@@ -1,6 +1,8 @@
 package me.outspending.testing
 
 import me.outspending.*
+import me.outspending.enums.ColumnConstraint
+import me.outspending.enums.ColumnType
 
 /**
  * This is a test class
@@ -11,6 +13,11 @@ import me.outspending.*
  */
 @Table
 data class Test(
-    @PrimaryKey(autoIncrement = true) val id: Int,
-    @Column(type = ColumnType.TEXT, constraints = [ColumnConstraint.NOTNULL]) val name: String
+    @PrimaryKey(type = ColumnType.INTEGER, autoIncrement = true) val id: Int,
+    @Column(type = ColumnType.TEXT, constraints = [ColumnConstraint.NOTNULL]) val name: String,
+    @Column(
+        type = ColumnType.INTEGER,
+        constraints = [ColumnConstraint.NOTNULL, ColumnConstraint.UNIQUE]
+    )
+    val age: Int
 )

@@ -1,79 +1,42 @@
 package me.outspending
 
+import me.outspending.generator.Generator
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 
+/**
+ * This class is the main entry point for this library. It is basically a wrapper around the
+ * [MunchProcessor] class. To make your life easier, you can use the [Munch] class to process a data
+ * class that has the [Table] annotation. This class is used to return a [MunchClass] instance that
+ * contains the primary key and columns of the data class. Then will be passed off to the
+ * [Generator] to generate the SQL.
+ *
+ * @param T The data class that has the [Table] annotation.
+ * @constructor Creates a new [Munch] instance.
+ * @property clazz The data class to be used.
+ * @see MunchClass
+ * @see MunchProcessor
+ * @see Table
+ * @see Generator
+ * @see PrimaryKey
+ * @see Column
+ * @see ColumnType
+ * @see ColumnConstraint
+ * @see MunchProcessor
+ * @author Outspending
+ * @since 1.0.0
+ */
 class MunchClass<T : Any>(
-    private val clazz: KClass<T>,
-    private val primaryKey: Pair<KProperty1<out T, *>, PrimaryKey>?,
-    private val columns: Map<KProperty1<out T, *>, Column>?
+    val clazz: KClass<T>,
+    val primaryKey: Pair<KProperty1<out T, *>, PrimaryKey>?,
+    val columns: Map<KProperty1<out T, *>, Column>?
 ) {
-    fun generateTableSQL(): String {
-        val string = StringBuilder("CREATE TABLE IF NOT EXISTS ")
-        val tableName = clazz.simpleName ?: throw IllegalArgumentException("Class name is null")
-
-        string.append(tableName)
-        string.append(" (")
-
-        handlePrimaryKey(string)
-        handleColumns(string)
-
-        string.append(")")
-        return string.toString()
-    }
-
-    private fun handlePrimaryKey(string: StringBuilder) {
-        primaryKey?.let { (property, primaryKeyOptions) ->
-            val hasAutoIncrement = primaryKeyOptions.autoIncrement
-            val classifier = property.returnType.classifier
-
-            if (hasAutoIncrement && classifier != Int::class) {
-                throw IllegalArgumentException("Auto increment can only be used on an int type")
-            }
-
-            val type = convertType(classifier as KClass<*>)
-            with(string) {
-                append("${property.name} $type")
-                append(" PRIMARY KEY${if (hasAutoIncrement) " AUTOINCREMENT" else ""}")
-            }
-
-            println("DONE!")
-        }
-    }
-
-    private fun handleColumns(string: StringBuilder) {
-        columns?.let {
-            it.forEach { (property, column) ->
-                val name = column.name.ifEmpty { property.name }
-                val type = convertType(property.returnType.classifier as KClass<*>)
-                val constraints = column.constraints.toList()
-
-                with(string) {
-                    append(", $name $type")
-                    constraints.forEach { constraint ->
-                        append(" ${convertConstraint(constraint)}")
-                    }
-                }
-            }
-        }
-    }
-
-
-    private fun convertType(type: KClass<*>): String {
-        return when (type) {
-            Int::class, Short::class, Long::class -> "INTEGER"
-            Double::class, Float::class -> "REAL"
-            String::class -> "TEXT"
-            else -> "NULL"
-        }
-    }
-
-    private fun convertConstraint(constraint: ColumnConstraint): String {
-        return when (constraint) {
-            ColumnConstraint.NOTNULL -> "NOT NULL"
-            ColumnConstraint.UNIQUE -> "UNIQUE"
-            ColumnConstraint.CHECK -> "CHECK"
-            ColumnConstraint.FOREIGN -> "FOREIGN KEY"
-        }
-    }
+    /**
+     * This method is used to execute a custom generator. This is also used for all the main
+     * generators. This method is used to generate the SQL for the data class.
+     *
+     * @author Outspending
+     * @since 1.0.0
+     */
+    fun generateCustom(generator: Generator<T>): String = generator.generate()
 }
