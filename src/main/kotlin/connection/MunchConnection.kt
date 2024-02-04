@@ -12,8 +12,10 @@ import java.sql.DriverManager
  * @author Outspending
  * @since 1.0.0
  */
-object MunchConnection {
-    private lateinit var connection: Connection
+class MunchConnection {
+    companion object {
+        private lateinit var connection: Connection
+    }
 
     /**
      * This method is used to connect to the SQLite database.
@@ -45,18 +47,15 @@ object MunchConnection {
      * @since 1.0.0
      */
     fun connect(file: File) {
-        if (!hasConnection()) {
-            try {
-                if (!file.exists()) {
-                    file.mkdirs()
-                    file.createNewFile()
-                }
-
-                val connectionURL = "jdbc:sqlite:${file.absolutePath}"
-                connection = DriverManager.getConnection(connectionURL)
-            } catch (e: IOException) {
-                e.printStackTrace()
+        try {
+            if (!file.exists()) {
+                file.createNewFile()
             }
+
+            val connectionURL = "jdbc:sqlite:${file.absolutePath}"
+            connection = DriverManager.getConnection(connectionURL)
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
     }
 
@@ -67,5 +66,5 @@ object MunchConnection {
      * @since 1.0.0
      * @since 1.0.0
      */
-    fun hasConnection(): Boolean = !this::connection.isInitialized || connection.isClosed
+    fun hasConnection(): Boolean = connection.isClosed
 }

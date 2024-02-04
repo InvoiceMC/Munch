@@ -8,8 +8,6 @@ import kotlin.time.measureTime
 
 fun main() {
     val time = measureTime {
-        MunchConnection.connect(File("testing.db"))
-
         val munch: Munch<Test> = Munch.create(Test::class)
         val clazz: MunchClass<Test> = munch.process()
 
