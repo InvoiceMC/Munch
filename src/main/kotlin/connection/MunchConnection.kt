@@ -2,6 +2,8 @@ package me.outspending.connection
 
 import me.outspending.MunchClass
 import me.outspending.generator.generateTable
+import me.outspending.serializer.Serializer
+import me.outspending.serializer.SerializerFactory
 import java.io.File
 import java.io.IOException
 import java.sql.*
@@ -80,6 +82,7 @@ class MunchConnection {
             e.printStackTrace()
         }
     }
+
     /**
      * This method gets all the data from the database.
      *
@@ -147,6 +150,7 @@ class MunchConnection {
      * @author Outspending
      * @since 1.0.0
      */
+    @Suppress("UNCHECKED_CAST")
     private fun <K> setType(statement: PreparedStatement, type: KClass<*>, value: K, index: Int = 1) {
         return when (type) {
             String::class -> statement.setString(index, value as String)
@@ -158,7 +162,13 @@ class MunchConnection {
             Double::class -> statement.setDouble(index, value as Double)
             Boolean::class -> statement.setBoolean(index, value as Boolean)
             else -> {
-                // TODO: This is for the serializer
+                val serializer: Serializer<K>? = SerializerFactory.getSerializer(type) as? Serializer<K>
+                if (serializer != null) {
+                    val serialized = serializer.serialize(value)
+                    statement.setString(index, serialized)
+                } else {
+                    throw IllegalArgumentException("The type $type is not supported")
+                }
             }
         }
     }

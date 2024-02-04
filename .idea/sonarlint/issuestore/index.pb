@@ -22,3 +22,7 @@ V
 :
 
 .gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
+X
+(src/main/kotlin/serializer/Serializer.kt,b\9\b9132ee0ebdb9ce8c714a7fad49ac109f7de0b8d
+_
+/src/main/kotlin/serializer/SerializerFactory.kt,3\6\3633a3b887db486c2864aba8fb4d63aa4c411fd0
