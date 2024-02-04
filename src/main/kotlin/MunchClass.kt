@@ -39,4 +39,12 @@ class MunchClass<T : Any>(
      * @since 1.0.0
      */
     fun generateCustom(generator: Generator<T>): String = generator.generate()
+
+    /**
+     * This method is used to get the name of the data class.
+     *
+     * @return The name of the data class.
+     * @since 1.0.0
+     */
+    fun getName() = clazz.simpleName
 }

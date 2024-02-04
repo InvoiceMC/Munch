@@ -7,11 +7,16 @@ import java.io.File
 import kotlin.time.measureTime
 
 fun main() {
+    val database = MunchConnection()
+
     val time = measureTime {
+        database.connect()
+
         val munch: Munch<Test> = Munch.create(Test::class)
         val clazz: MunchClass<Test> = munch.process()
 
-        println(clazz.generateTable())
+        database.createTable(clazz)
+        println(database.getDataByPrimary(clazz, 1))
     }
 
     println("Time: $time")
