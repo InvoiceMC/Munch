@@ -29,10 +29,12 @@ dependencies {
     jmh("org.openjdk.jmh:jmh-generator-bytecode:0.9")
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("maven") {
+                from(components["java"])
+            }
         }
     }
 }
