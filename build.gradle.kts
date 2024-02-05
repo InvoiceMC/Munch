@@ -1,7 +1,11 @@
 plugins {
     kotlin("jvm") version "1.9.22"
     id("me.champeau.jmh") version "0.7.2"
+    id("maven-publish")
 }
+
+apply(plugin = "kotlin")
+apply(plugin = "maven-publish")
 
 group = "me.outspending"
 version = "1.0-SNAPSHOT"
@@ -23,6 +27,21 @@ dependencies {
     jmh("org.openjdk.jmh:jmh-core:0.9")
     jmh("org.openjdk.jmh:jmh-generator-annprocess:0.9")
     jmh("org.openjdk.jmh:jmh-generator-bytecode:0.9")
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+        }
+    }
+}
+
+tasks {
+    wrapper {
+        gradleVersion = "7.3.3"
+        distributionType = Wrapper.DistributionType.ALL
+    }
 }
 
 kotlin {

@@ -32,8 +32,6 @@ _
 ,src/main/kotlin/generator/DeleteGenerator.kt,f\9\f94327bf43c2415b2b03af3facf5cebd78bb4907
 \
 ,src/main/kotlin/generator/SelectGenerator.kt,4\7\473d940a6d8081d8ae05cfa259788b19a9000174
-_
-/src/main/kotlin/generator/SelectAllGenerator.kt,1\6\168328e66352ec1af339f94dea3a2cf7fdac70c2
 L
 src/main/kotlin/test/Test.kt,b\0\b086dc9bcb4af7f4b7852d87de84727280be9bd8
 Q
@@ -44,3 +42,7 @@ M
 src/main/kotlin/Generators.kt,7\8\78b6d3cd8ca9e55ad83ad88ccf620c3f4009f999
 [
 +src/main/kotlin/connection/MunchDatabase.kt,2\2\22451010ffb58ff996487bc023b2c4d11ea82078
+[
++src/main/kotlin/connection/CustomSorting.kt,c\a\cabe7f709b36a14a1907d0f0ee97b9ad5c822c6a
+;
+jitpack.yml,3\f\3f384c5ac91d01ea9ab11981ab87f1d958f63284
