@@ -1,26 +1,27 @@
 package me.outspending.connection
 
+import me.outspending.Functions.runAsyncIf
+import me.outspending.MunchClass
+import me.outspending.generator.*
 import java.io.File
 import java.io.IOException
-import java.sql.*
-import kotlin.reflect.jvm.isAccessible
-import me.outspending.MunchClass
-import me.outspending.generator.generateInsert
-import me.outspending.generator.generateSelect
-import me.outspending.generator.generateSelectAll
-import me.outspending.generator.generateTable
+import java.sql.Connection
+import java.sql.DriverManager
+import java.sql.PreparedStatement
+import java.sql.SQLException
 
 class MunchDatabase : MunchConnection {
     companion object {
         private lateinit var connection: Connection
     }
 
-    override fun connect(databaseName: String) = connect(File(databaseName))
+    override fun connect(databaseName: String, runAsync: Boolean) =
+        connect(File(databaseName), runAsync)
 
-    override fun connect(parentPath: File, databaseName: String) =
-        connect(File(parentPath, databaseName))
+    override fun connect(parentPath: File, databaseName: String, runAsync: Boolean) =
+        connect(File(parentPath, databaseName), runAsync)
 
-    override fun connect(file: File) {
+    override fun connect(file: File, runAsync: Boolean) {
         try {
             if (!file.exists()) {
                 file.createNewFile()
@@ -33,40 +34,10 @@ class MunchDatabase : MunchConnection {
         }
     }
 
-    override fun runSQL(sql: String, execute: (PreparedStatement) -> Unit) {
+    override fun <T : Any> runSQL(sql: String, execute: (PreparedStatement) -> T?): T? {
         try {
             val statement = connection.prepareStatement(sql)
-            execute(statement)
-        } catch (e: SQLException) {
-            e.printStackTrace()
-        }
-    }
-
-    override fun <T : Any, K : Any> createTable(clazz: MunchClass<T, K>) {
-        val sql = clazz.generateTable()
-
-        try {
-            val statement = connection.createStatement()
-
-            statement.execute(sql)
-        } catch (e: SQLException) {
-            e.printStackTrace()
-        }
-    }
-
-    override fun <T : Any, K : Any> getAllData(clazz: MunchClass<T, K>): List<T>? {
-        val sql = clazz.generateSelectAll()
-
-        try {
-            val statement = connection.prepareStatement(sql)
-            val resultSet = statement.executeQuery()
-
-            val list = mutableListOf<T>()
-            while (resultSet.next()) {
-                generateType(clazz.clazz, resultSet)?.let { list.add(it) }
-            }
-
-            return list
+            return execute(statement)
         } catch (e: SQLException) {
             e.printStackTrace()
         }
@@ -74,56 +45,126 @@ class MunchDatabase : MunchConnection {
         return null
     }
 
-    override fun <T : Any, K : Any> hasData(clazz: MunchClass<T, K>, value: K): Boolean {
-        val sql = clazz.generateSelect()
-
-        try {
-            val statement = connection.prepareStatement(sql)
-            setValue(statement, 1, value)
-
-            return statement.executeQuery().next()
-        } catch (e: SQLException) {
-            e.printStackTrace()
+    override fun <T : Any, K : Any> createTable(clazz: MunchClass<T, K>, runAsync: Boolean) {
+        runAsyncIf(runAsync) {
+            val sql = clazz.generateTable()
+            runSQL(sql) { statement -> statement.execute() }
         }
-
-        return false
     }
 
-    override fun <T : Any, K : Any> addData(clazz: MunchClass<T, K>, obj: T) {
-        val sql = clazz.generateInsert()
+    override fun <T : Any, K : Any> getAllData(
+        clazz: MunchClass<T, K>,
+        runAsync: Boolean
+    ): List<T>? {
+        return runAsyncIf(runAsync) {
+            val sql = clazz.generateSelectAll()
+            runSQL(sql) { statement ->
+                val resultSet = statement.executeQuery()
 
-        try {
-            val statement = connection.prepareStatement(sql)
+                val list = mutableListOf<T>()
+                while (resultSet.next()) {
+                    generateType(clazz.clazz, resultSet)?.let { list.add(it) }
+                }
 
-            for ((index, property) in obj::class.java.declaredFields.withIndex()) {
-                property.isAccessible = true
-
-                val value = property.get(obj)
-                value?.let { setValue(statement, index + 1, it) }
+                list
             }
-
-            statement.executeUpdate()
-        } catch (e: SQLException) {
-            e.printStackTrace()
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : Any, K : Any> getData(clazz: MunchClass<T, K>, value: K): T? {
-        val sql = clazz.generateSelect()
+    override fun <T : Any, K : Any> hasData(
+        clazz: MunchClass<T, K>,
+        value: K,
+        runAsync: Boolean
+    ): Boolean? {
+        return runAsyncIf(runAsync) {
+            val sql = clazz.generateSelect()
 
-        try {
-            val statement = connection.prepareStatement(sql)
+            runSQL(sql) { statement ->
+                setValue(statement, 1, value)
+
+                statement.executeQuery().next()
+            }
+        }
+    }
+
+    override fun <T : Any, K : Any> addData(clazz: MunchClass<T, K>, obj: T, runAsync: Boolean) {
+        runAsyncIf(runAsync) {
+            val sql = clazz.generateInsert()
+            runSQL(sql) { statement ->
+                addValue(statement, obj)
+
+                statement.execute()
+            }
+        }
+    }
+
+    override fun <T : Any, K : Any> addAllData(
+        clazz: MunchClass<T, K>,
+        obj: Array<T>,
+        runAsync: Boolean
+    ) = addAllData(clazz, obj.toList(), runAsync)
+
+    override fun <T : Any, K : Any> addAllData(
+        clazz: MunchClass<T, K>,
+        obj: List<T>,
+        runAsync: Boolean
+    ) {
+        runAsyncIf(runAsync) {
+            val sql = clazz.generateInsert()
+            runSQL(sql) { statement ->
+                for (data in obj) {
+                    addValue(statement, obj)
+
+                    statement.addBatch()
+                }
+
+                statement.executeBatch()
+            }
+        }
+    }
+
+    override fun <T : Any, K : Any> getData(
+        clazz: MunchClass<T, K>,
+        value: K,
+        runAsync: Boolean
+    ): T? {
+        val sql = clazz.generateSelect()
+        return runSQL(sql) { statement ->
             setValue(statement, 1, value)
 
             val resultSet = statement.executeQuery()
-            if (!resultSet.next()) return null
+            if (!resultSet.next()) return@runSQL null
 
-            return generateType(clazz.clazz, resultSet)
-        } catch (e: SQLException) {
-            e.printStackTrace()
+            generateType(clazz.clazz, resultSet)
         }
+    }
 
-        return null
+    override fun <T : Any, K : Any> deleteTable(clazz: MunchClass<T, K>, runAsync: Boolean) {
+        runAsyncIf(runAsync) {
+            val sql = clazz.generateDeleteTable()
+            runSQL(sql) { statement -> statement.execute() }
+        }
+    }
+
+    override fun <T : Any, K : Any> deleteAllData(clazz: MunchClass<T, K>, runAsync: Boolean) {
+        runAsyncIf(runAsync) {
+            val sql = clazz.generateDeleteAll()
+            runSQL(sql) { statement -> statement.execute() }
+        }
+    }
+
+    override fun <T : Any, K : Any> deleteData(
+        clazz: MunchClass<T, K>,
+        value: K,
+        runAsync: Boolean
+    ) {
+        runAsyncIf(runAsync) {
+            val sql = clazz.generateDelete()
+
+            runSQL(sql) { statement ->
+                setValue(statement, 1, value)
+                statement.execute()
+            }
+        }
     }
 }

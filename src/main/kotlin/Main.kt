@@ -34,14 +34,6 @@ fun main() {
     val test: Munch<Test> = Test::class.toMunch()
     val clazz: MunchClass<Test, Int> = test.process()
 
-    val time = measureTimeNumerousTimes(7500) {
-        clazz.generateInsert()
-        clazz.generateUpdate()
-        clazz.generateSelectAll()
-        clazz.generateSelect()
-        clazz.generateTable()
-        clazz.generateDelete()
-    }
-
-    println("Finished in $time!")
+    val value = Test(10, "Hello, World!", 150)
+    database.addData(clazz, value, true)
 }

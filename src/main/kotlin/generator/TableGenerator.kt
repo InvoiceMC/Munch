@@ -1,9 +1,9 @@
 package me.outspending.generator
 
 import me.outspending.AllGenerator
-import kotlin.reflect.KProperty1
 import me.outspending.Column
 import me.outspending.MunchClass
+import kotlin.reflect.KProperty1
 
 /**
  * This extension function is used to generate the SQL for the data class.
@@ -49,7 +49,7 @@ class TableGenerator<T : Any, K : Any>(clazz: MunchClass<T, K>) : AllGenerator<T
 
     override fun handleColumn(property: KProperty1<out T, *>, column: Column) {
         val type = column.type.value
-        val constraints = column.constraints.toList()
+        val constraints = column.constraints
 
         builder.apply {
             append(", ${property.name} $type")
