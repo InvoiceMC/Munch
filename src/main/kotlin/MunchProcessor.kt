@@ -39,7 +39,7 @@ class MunchProcessor<T : Any>(val munch: Munch<T>) {
         val primaryKey = getPrimaryKey()
         val columns = getColumns()
 
-        val primaryKeyClass = primaryKey?.first?.returnType?.classifier as KClass<K>
+        val primaryKeyClass = primaryKey.first.returnType.classifier as KClass<K>
         return MunchClass(munch.getClass(), primaryKeyClass, primaryKey, columns)
     }
 
@@ -52,7 +52,7 @@ class MunchProcessor<T : Any>(val munch: Munch<T>) {
      * @author Outspending
      * @since 1.0
      */
-    fun getPrimaryKey(): Pair<KProperty1<out T, *>, PrimaryKey>? {
+    fun getPrimaryKey(): Pair<KProperty1<out T, *>, PrimaryKey> {
         val primaryKey =
             munch
                 .getProperties()
@@ -60,7 +60,7 @@ class MunchProcessor<T : Any>(val munch: Munch<T>) {
                 .toList()
 
         if (primaryKey.size > 1) throw IllegalArgumentException("Multiple primary keys found")
-        if (primaryKey.isEmpty()) return null
+        if (primaryKey.isEmpty()) throw IllegalArgumentException("No primary key found")
 
         val main = primaryKey[0]
         return (main to main.annotations.first { it is PrimaryKey } as PrimaryKey)
@@ -74,7 +74,7 @@ class MunchProcessor<T : Any>(val munch: Munch<T>) {
      * @author Outspending
      * @since 1.0
      */
-    fun getColumns(): Map<KProperty1<out T, *>, Column>? {
+    fun getColumns(): Map<KProperty1<out T, *>, Column> {
         val clazz = munch.getClass()
         val fields = clazz.java.declaredFields
         val orderByID = fields.withIndex().associate { it.value.name to it.index }
@@ -85,7 +85,7 @@ class MunchProcessor<T : Any>(val munch: Munch<T>) {
                 .filter { it.annotations.any { annotation -> annotation is Column } }
                 .sortedBy { orderByID[it.name] }
 
-        if (columns.isEmpty()) return null
+        if (columns.isEmpty()) throw IllegalArgumentException("No columns found")
 
         return columns.associateWith {
             it.annotations.first { column -> column is Column } as Column

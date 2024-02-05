@@ -47,7 +47,9 @@ class DeleteGenerator<T : Any, K : Any>(clazz: MunchClass<T, K>) :
     }
 
     override fun handlePrimaryKey() {
-        primaryKey?.let { (property, _) -> builder.append("${property.name} = ?;") }
+        val property = primaryKey.first
+
+        builder.append("${property.name} = ?;")
     }
 }
 

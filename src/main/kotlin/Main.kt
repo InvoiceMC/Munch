@@ -34,6 +34,17 @@ fun main() {
     val test: Munch<Test> = Test::class.toMunch()
     val clazz: MunchClass<Test, Int> = test.process()
 
-    val value = Test(10, "Hello, World!", 150)
-    database.addData(clazz, value, true)
+    printAllGenerators(clazz)
+//    val value = Test(10, "Hello, World!", 150)
+//    database.addData(clazz, value, true)
+}
+
+fun printAllGenerators(clazz: MunchClass<*, *>) {
+    println(clazz.generateSelectAll())
+    println(clazz.generateSelect())
+    println(clazz.generateDeleteAll())
+    println(clazz.generateTable())
+    println(clazz.generateDelete())
+    println(clazz.generateUpdate())
+    println(clazz.generateInsert())
 }

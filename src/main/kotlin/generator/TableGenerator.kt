@@ -30,21 +30,22 @@ class TableGenerator<T : Any, K : Any>(clazz: MunchClass<T, K>) : AllGenerator<T
     }
 
     override fun handlePrimaryKey() {
-        primaryKey?.let { (property, primaryKey) ->
-            val hasAutoIncrement = primaryKey.autoIncrement
-            require(!(hasAutoIncrement && property.returnType.classifier != Int::class)) {
-                "Auto increment can only be used on an int type!"
-            }
+        val property = primaryKey.first
+        val primaryKey = primaryKey.second
 
-            val type = primaryKey.type.value
-            builder.append(
-                "${property.name} $type PRIMARY KEY${if (hasAutoIncrement) " AUTOINCREMENT" else ""}"
-            )
+        val hasAutoIncrement = primaryKey.autoIncrement
+        require(!(hasAutoIncrement && property.returnType.classifier != Int::class)) {
+            "Auto increment can only be used on an int type!"
         }
+
+        val type = primaryKey.type.value
+        builder.append(
+            "${property.name} $type PRIMARY KEY${if (hasAutoIncrement) " AUTOINCREMENT" else ""}"
+        )
     }
 
     override fun handleColumns() {
-        columns?.forEach { (property, column) -> handleColumn(property, column) }
+        columns.forEach { (property, column) -> handleColumn(property, column) }
     }
 
     override fun handleColumn(property: KProperty1<out T, *>, column: Column) {

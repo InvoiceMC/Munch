@@ -37,11 +37,13 @@ class InsertGenerator<T : Any, K : Any>(clazz: MunchClass<T, K>) : AllGenerator<
     }
 
     override fun handlePrimaryKey() {
-        primaryKey?.let { (property, _) -> builder.append("${property.name}, ") }
+        val property = primaryKey.first
+
+        builder.append("${property.name}, ")
     }
 
     override fun handleColumns() {
-        columns?.forEach { (property, column) ->
+        columns.forEach { (property, column) ->
             currentIndex++
             handleColumn(property, column)
         }

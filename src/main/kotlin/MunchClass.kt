@@ -19,8 +19,6 @@ import kotlin.reflect.KProperty1
  * @see Generator
  * @see PrimaryKey
  * @see Column
- * @see ColumnType
- * @see ColumnConstraint
  * @see MunchProcessor
  * @author Outspending
  * @since 1.0.0
@@ -28,8 +26,8 @@ import kotlin.reflect.KProperty1
 class MunchClass<T : Any, K : Any>(
     val clazz: KClass<T>,
     val primaryKeyClass: KClass<K>,
-    val primaryKey: Pair<KProperty1<out T, *>, PrimaryKey>?,
-    val columns: Map<KProperty1<out T, *>, Column>?
+    val primaryKey: Pair<KProperty1<out T, *>, PrimaryKey>,
+    val columns: Map<KProperty1<out T, *>, Column>
 ) {
     /**
      * This method is used to execute a custom generator. This is also used for all the main
@@ -56,5 +54,5 @@ class MunchClass<T : Any, K : Any>(
      * @author Outspending
      * @since 1.0.0
      */
-    fun getAmount(): Int = if (primaryKey != null && columns != null) columns.size + 1 else 0
+    fun getAmount(): Int = columns.size + 1
 }
