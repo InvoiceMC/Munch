@@ -22,15 +22,17 @@ class MunchDatabase : MunchConnection {
         connect(File(parentPath, databaseName), runAsync)
 
     override fun connect(file: File, runAsync: Boolean) {
-        try {
-            if (!file.exists()) {
-                file.createNewFile()
-            }
+        runAsyncIf(runAsync) {
+            try {
+                if (!file.exists()) {
+                    file.createNewFile()
+                }
 
-            val connectionURL = "jdbc:sqlite:${file.absolutePath}"
-            connection = DriverManager.getConnection(connectionURL)
-        } catch (e: IOException) {
-            e.printStackTrace()
+                val connectionURL = "jdbc:sqlite:${file.absolutePath}"
+                connection = DriverManager.getConnection(connectionURL)
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
         }
     }
 
@@ -113,7 +115,7 @@ class MunchDatabase : MunchConnection {
             val sql = clazz.generateInsert()
             runSQL(sql) { statement ->
                 for (data in obj) {
-                    addValue(statement, obj)
+                    addValue(statement, data)
 
                     statement.addBatch()
                 }
@@ -164,6 +166,45 @@ class MunchDatabase : MunchConnection {
             runSQL(sql) { statement ->
                 setValue(statement, 1, value)
                 statement.execute()
+            }
+        }
+    }
+
+    override fun <T : Any, K : Any> updateData(clazz: MunchClass<T, K>, obj: T, key: K, runAsync: Boolean) {
+        runAsyncIf(runAsync) {
+            val sql = clazz.generateUpdate()
+            println(sql)
+
+            runSQL(sql) { statement ->
+                val columns = clazz.columns.keys.toList()
+
+                val currentIndex = addKotlinValues(statement, obj, columns)
+                setValue(statement, currentIndex, key)
+
+                statement.execute()
+
+            }
+        }
+    }
+
+    override fun <T : Any, K : Any> updateAllData(clazz: MunchClass<T, K>, obj: Array<T>, runAsync: Boolean) =
+        updateAllData(clazz, obj.toList(), runAsync)
+
+    override fun <T : Any, K : Any> updateAllData(clazz: MunchClass<T, K>, obj: List<T>, runAsync: Boolean) {
+        runAsyncIf(runAsync) {
+            val sql = clazz.generateUpdate()
+            runSQL(sql) { statement ->
+                for (data in obj) {
+                    val key = clazz.primaryKey.first.call(data) 
+                    val columns = clazz.columns.keys.toList()
+
+                    val currentIndex = addKotlinValues(statement, data, columns)
+                    key?.let { setValue(statement, currentIndex, it) }
+
+                    statement.addBatch()
+                }
+
+                statement.executeBatch()
             }
         }
     }

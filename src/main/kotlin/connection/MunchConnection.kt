@@ -1,14 +1,17 @@
 package me.outspending.connection
 
-import me.outspending.MunchClass
-import me.outspending.serializer.SerializerFactory
 import java.io.File
 import java.io.IOException
+import java.lang.reflect.Field
 import java.sql.*
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
+import kotlin.reflect.KProperty1
 import kotlin.reflect.full.*
 import kotlin.reflect.jvm.isAccessible
+import kotlin.reflect.jvm.javaField
+import me.outspending.MunchClass
+import me.outspending.serializer.SerializerFactory
 
 /**
  * This class is used to connect to Munch's SQLite database. You can also use your own connection if
@@ -101,7 +104,11 @@ interface MunchConnection {
      * @author Outspending
      * @since 1.0.0
      */
-    fun <T : Any, K : Any> hasData(clazz: MunchClass<T, K>, value: K, runAsync: Boolean = false): Boolean?
+    fun <T : Any, K : Any> hasData(
+        clazz: MunchClass<T, K>,
+        value: K,
+        runAsync: Boolean = false
+    ): Boolean?
 
     /**
      * This method is used to insert data into the database.
@@ -123,7 +130,11 @@ interface MunchConnection {
      * @see MunchClass
      * @since 1.0.0
      */
-    fun <T : Any, K : Any> addAllData(clazz: MunchClass<T, K>, obj: Array<T>, runAsync: Boolean = false)
+    fun <T : Any, K : Any> addAllData(
+        clazz: MunchClass<T, K>,
+        obj: Array<T>,
+        runAsync: Boolean = false
+    )
 
     /**
      * This method is used to insert data into the database.
@@ -135,7 +146,11 @@ interface MunchConnection {
      * @see MunchClass
      * @since 1.0.0
      */
-    fun <T : Any, K : Any> addAllData(clazz: MunchClass<T, K>, obj: List<T>, runAsync: Boolean = false)
+    fun <T : Any, K : Any> addAllData(
+        clazz: MunchClass<T, K>,
+        obj: List<T>,
+        runAsync: Boolean = false
+    )
 
     /**
      * This method is used to insert data into the database.
@@ -183,13 +198,77 @@ interface MunchConnection {
      */
     fun <T : Any, K : Any> deleteData(clazz: MunchClass<T, K>, value: K, runAsync: Boolean = false)
 
-    fun addValue(statement: PreparedStatement, obj: Any) {
-        for ((index, property) in obj::class.java.declaredFields.withIndex()) {
-            property.isAccessible = true
+    /**
+     * This method is used to update data in the database.
+     *
+     * @param clazz The [MunchClass] instance to be used.
+     * @param obj The object to be updated in the database.
+     * @throws SQLException If the data cannot be updated.
+     * @see SQLException
+     * @see MunchClass
+     * @since 1.0.0
+     */
+    fun <T : Any, K : Any> updateData(
+        clazz: MunchClass<T, K>,
+        obj: T,
+        key: K,
+        runAsync: Boolean = false
+    )
 
-            val value = property.get(obj)
+    /**
+     * This method is used to update data in the database.
+     *
+     * @param clazz The [MunchClass] instance to be used.
+     * @param obj The object to be updated in the database.
+     * @throws SQLException If the data cannot be updated.
+     * @see SQLException
+     * @see MunchClass
+     * @since 1.0.0
+     */
+    fun <T : Any, K : Any> updateAllData(
+        clazz: MunchClass<T, K>,
+        obj: Array<T>,
+        runAsync: Boolean = false
+    )
+
+    /**
+     * This method is used to update data in the database.
+     *
+     * @param clazz The [MunchClass] instance to be used.
+     * @param obj The object to be updated in the database.
+     * @throws SQLException If the data cannot be updated.
+     * @see SQLException
+     * @see MunchClass
+     * @since 1.0.0
+     */
+    fun <T : Any, K : Any> updateAllData(
+        clazz: MunchClass<T, K>,
+        obj: List<T>,
+        runAsync: Boolean = false
+    )
+
+    fun addValue(statement: PreparedStatement, obj: Any): Int {
+        val fields = obj::class.java.declaredFields
+        addValues(statement, obj, fields.toList())
+
+        return fields.size
+    }
+
+    fun <T> addKotlinValues(
+        statement: PreparedStatement,
+        obj: Any,
+        fields: List<KProperty1<out T, *>>
+    ) = addValues(statement, obj, fields.map { it.javaField!! })
+
+    fun addValues(statement: PreparedStatement, obj: Any, fields: List<Field>): Int {
+        for ((index, field) in fields.withIndex()) {
+            field.isAccessible = true
+
+            val value = field.get(obj)
             value?.let { setValue(statement, index + 1, it) }
         }
+
+        return fields.size + 1
     }
 
     /**

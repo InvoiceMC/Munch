@@ -34,7 +34,17 @@ fun main() {
     val test: Munch<Test> = Test::class.toMunch()
     val clazz: MunchClass<Test, Int> = test.process()
 
-    printAllGenerators(clazz)
+    runAsync {
+        // database.deleteAllData(clazz)
+        val test1 = Test(10, "Hello, World!", 5734957)
+        //database.addData(clazz, test1)
+        val time = measureTime {
+            database.updateData(clazz, test1, 10)
+        }
+
+        println("Finished updating all data in $time!")
+    }
+
 //    val value = Test(10, "Hello, World!", 150)
 //    database.addData(clazz, value, true)
 }
