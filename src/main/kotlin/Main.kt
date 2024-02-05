@@ -1,24 +1,47 @@
 package me.outspending
 
+import me.outspending.Functions.runAsync
 import me.outspending.Functions.toMunch
 import me.outspending.connection.MunchConnection
-import me.outspending.generator.generateTable
+import me.outspending.generator.*
 import me.outspending.test.Test
-import kotlin.time.measureTime
+import kotlin.time.*
 
-val database = MunchConnection()
+val database = MunchConnection.create()
+
+fun measureTimeNumerousTimes(times: Int, block: () -> Unit): Duration {
+    // Warmup stage fr fr
+    repeat(100) {
+        block()
+    }
+
+    System.gc()
+
+    var totalTime = 0.0
+    repeat(times) {
+        val time = measureTime {
+            block()
+        }
+        totalTime += time.inWholeNanoseconds
+    }
+
+    return (totalTime / times).toDuration(DurationUnit.NANOSECONDS)
+}
+
 fun main() {
     database.connect()
 
     val test: Munch<Test> = Test::class.toMunch()
     val clazz: MunchClass<Test, Int> = test.process()
 
-    val time = measureTime {
-        // val test = Test(1, "Test", 10)
-
-        val data = database.getData(clazz, 1)
-        println(data)
+    val time = measureTimeNumerousTimes(7500) {
+        clazz.generateInsert()
+        clazz.generateUpdate()
+        clazz.generateSelectAll()
+        clazz.generateSelect()
+        clazz.generateTable()
+        clazz.generateDelete()
     }
 
-    println("Finished in $time")
+    println("Finished in $time!")
 }

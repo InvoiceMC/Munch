@@ -1,11 +1,5 @@
 package me.outspending.connection
 
-import me.outspending.MunchClass
-import me.outspending.generator.generateInsert
-import me.outspending.generator.generateSelect
-import me.outspending.generator.generateSelectAll
-import me.outspending.generator.generateTable
-import me.outspending.serializer.SerializerFactory
 import java.io.File
 import java.io.IOException
 import java.sql.*
@@ -13,6 +7,8 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.full.*
 import kotlin.reflect.jvm.isAccessible
+import me.outspending.MunchClass
+import me.outspending.serializer.SerializerFactory
 
 /**
  * This class is used to connect to Munch's SQLite database. You can also use your own connection if
@@ -21,9 +17,18 @@ import kotlin.reflect.jvm.isAccessible
  * @author Outspending
  * @since 1.0.0
  */
-class MunchConnection {
+interface MunchConnection {
     companion object {
-        private lateinit var connection: Connection
+
+        /**
+         * This method is used to create a new instance of the [MunchConnection] interface.
+         *
+         * @return A new instance of the [MunchConnection] interface.
+         * @see MunchConnection
+         * @author Outspending
+         * @since 1.0.0
+         */
+        fun create(): MunchConnection = MunchDatabase()
     }
 
     /**
@@ -31,19 +36,10 @@ class MunchConnection {
      *
      * @param databaseName The name of the database.
      * @throws IOException If the file cannot be created.
+     * @author Outspending
      * @since 1.0.0
      */
-    fun connect(databaseName: String = "database.db") = connect(File(databaseName))
-
-    /**
-     * This method is used to connect to the SQLite database.
-     *
-     * @param parentPath The parent path of the database.
-     * @param databaseName The name of the database.
-     * @throws IOException If the file cannot be created.
-     * @since 1.0.0
-     */
-    fun connect(parentPath: File, databaseName: String) = connect(File(parentPath, databaseName))
+    fun connect(databaseName: String = "database.db")
 
     /**
      * This method is used to connect to the SQLite database.
@@ -53,38 +49,38 @@ class MunchConnection {
      * @throws IOException If the file cannot be created.
      * @author Outspending
      * @since 1.0.0
+     */
+    fun connect(parentPath: File, databaseName: String)
+
+    /**
+     * This method is used to connect to the SQLite database.
+     *
+     * @param parentPath The parent path of the database.
+     * @param databaseName The name of the database.
+     * @throws IOException If the file cannot be created.
+     * @author Outspending
      * @since 1.0.0
      */
-    fun connect(file: File) {
-        try {
-            if (!file.exists()) {
-                file.createNewFile()
-            }
+    fun connect(file: File)
 
-            val connectionURL = "jdbc:sqlite:${file.absolutePath}"
-            connection = DriverManager.getConnection(connectionURL)
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-    }
+    /**
+     * This method is used to run custom SQL without any generators.
+     *
+     * @param sql The SQL to be executed.
+     * @param execute The lambda to execute the SQL.
+     * @author Outspending
+     * @since 1.0.0
+     */
+    fun runSQL(sql: String, execute: (PreparedStatement) -> Unit)
 
     /**
      * This method is used to create a table in the database.
      *
      * @param clazz The [MunchClass] instance to be used.
+     * @author Outspending
      * @since 1.0.0
      */
-    fun <T : Any, K : Any> createTable(clazz: MunchClass<T, K>) {
-        val sql = clazz.generateTable()
-
-        try {
-            val statement = connection.createStatement()
-
-            statement.execute(sql)
-        } catch (e: SQLException) {
-            e.printStackTrace()
-        }
-    }
+    fun <T : Any, K : Any> createTable(clazz: MunchClass<T, K>)
 
     /**
      * This method gets all the data from the database.
@@ -94,19 +90,7 @@ class MunchConnection {
      * @author Outspending
      * @since 1.0.0
      */
-    fun <T : Any, K : Any> getAllData(clazz: MunchClass<T, K>): ResultSet? {
-        val sql = clazz.generateSelectAll()
-
-        try {
-            val statement = connection.prepareStatement(sql)
-
-            return statement.executeQuery()
-        } catch (e: SQLException) {
-            e.printStackTrace()
-        }
-
-        return null
-    }
+    fun <T : Any, K : Any> getAllData(clazz: MunchClass<T, K>): List<T>?
 
     /**
      * This method is used to check if the data exists in the database.
@@ -114,110 +98,38 @@ class MunchConnection {
      * @param clazz The [MunchClass] instance to be used.
      * @param value The value to be checked.
      * @return If the data exists in the database.
+     * @author Outspending
      * @since 1.0.0
      */
-    fun <T : Any, K : Any> hasData(clazz: MunchClass<T, K>, value: K): Boolean {
-        val sql = clazz.generateSelect()
-
-        try {
-            val statement = connection.prepareStatement(sql)
-            setValue(statement, 1, value)
-
-            return statement.executeQuery().next()
-        } catch (e: SQLException) {
-            e.printStackTrace()
-        }
-
-        return false
-    }
+    fun <T : Any, K : Any> hasData(clazz: MunchClass<T, K>, value: K): Boolean
 
     /**
      * This method is used to insert data into the database.
      *
      * @param clazz The [MunchClass] instance to be used.
      * @param obj The object to be inserted into the database.
+     * @author Outspending
      * @since 1.0.0
      */
-    fun <T : Any, K : Any> addData(clazz: MunchClass<T, K>, obj: T) {
-        val sql = clazz.generateInsert()
-
-        try {
-            val statement = connection.prepareStatement(sql)
-
-            for ((index, property) in obj::class.java.declaredFields.withIndex()) {
-                property.isAccessible = true
-                println(property.name)
-
-                val value = property.get(obj)
-                value?.let { setValue(statement, index + 1, it) }
-            }
-
-            statement.executeUpdate()
-        } catch (e: SQLException) {
-            e.printStackTrace()
-        }
-    }
+    fun <T : Any, K : Any> addData(clazz: MunchClass<T, K>, obj: T)
 
     /**
      * This method is used to insert data into the database.
      *
      * @param clazz The [MunchClass] instance to be used.
      * @param obj The object to be inserted into the database.
+     * @author Outspending
      * @since 1.0.0
      */
-    @Suppress("UNCHECKED_CAST")
-    fun <T : Any, K : Any> getData(clazz: MunchClass<T, K>, value: K): T? {
-        val sql = clazz.generateSelect()
-
-        try {
-            val statement = connection.prepareStatement(sql)
-            setValue(statement, 1, value)
-
-            val resultSet = statement.executeQuery()
-            if (!resultSet.next()) return null
-
-            val obj = clazz.clazz.createInstance()
-            for (property in obj::class.memberProperties) {
-                val mutableProperty = (property as? KMutableProperty1<T, *>) ?: continue
-
-                val setValue: (Any?) -> Unit = { newValue ->
-                    mutableProperty.isAccessible = true
-                    mutableProperty.setter.call(obj, newValue)
-                }
-
-                when (property.returnType.classifier) {
-                    String::class -> setValue(resultSet.getString(property.name))
-                    Int::class -> setValue(resultSet.getInt(property.name))
-                    Long::class -> setValue(resultSet.getLong(property.name))
-                    Double::class -> setValue(resultSet.getDouble(property.name))
-                    Float::class -> setValue(resultSet.getFloat(property.name))
-                    Boolean::class -> setValue(resultSet.getBoolean(property.name))
-                    else -> {
-                        val serializer = SerializerFactory.getSerializer(property.returnType.classifier as KClass<*>)
-                        serializer?.let {
-                            val serializedValue = resultSet.getString(property.name)
-                            val deserialized = serializer.deserialize(serializedValue)
-
-                            setValue(deserialized)
-                        }
-                    }
-                }
-            }
-
-            return obj
-        } catch (e: SQLException) {
-            e.printStackTrace()
-        }
-
-        return null
-    }
+    fun <T : Any, K : Any> getData(clazz: MunchClass<T, K>, value: K): T?
 
     /**
      * This method is used to close the connection to the database.
      *
+     * @author Outspending
      * @since 1.0.0
      */
-    private fun setValue(statement: PreparedStatement, index: Int, value: Any) {
+    fun setValue(statement: PreparedStatement, index: Int, value: Any) {
         when (val clazz = value::class) {
             String::class -> statement.setString(index, value as String)
             Int::class -> statement.setInt(index, value as Int)
@@ -234,5 +146,39 @@ class MunchConnection {
                 }
             }
         }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun <T : Any> generateType(clazz: KClass<T>, resultSet: ResultSet): T? {
+        val obj = clazz.createInstance()
+        for (property in obj::class.memberProperties) {
+            val mutableProperty = (property as? KMutableProperty1<T, *>) ?: continue
+
+            val setValue: (Any?) -> Unit = { newValue ->
+                mutableProperty.isAccessible = true
+                mutableProperty.setter.call(obj, newValue)
+            }
+
+            when (property.returnType.classifier) {
+                String::class -> setValue(resultSet.getString(property.name))
+                Int::class -> setValue(resultSet.getInt(property.name))
+                Long::class -> setValue(resultSet.getLong(property.name))
+                Double::class -> setValue(resultSet.getDouble(property.name))
+                Float::class -> setValue(resultSet.getFloat(property.name))
+                Boolean::class -> setValue(resultSet.getBoolean(property.name))
+                else -> {
+                    val serializer =
+                        SerializerFactory.getSerializer(property.returnType.classifier as KClass<*>)
+                    serializer?.let {
+                        val serializedValue = resultSet.getString(property.name)
+                        val deserialized = serializer.deserialize(serializedValue)
+
+                        setValue(deserialized)
+                    }
+                }
+            }
+        }
+
+        return obj
     }
 }
