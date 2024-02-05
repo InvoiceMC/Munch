@@ -3,7 +3,6 @@ package me.outspending
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.memberProperties
-import me.outspending.generator.types.Generator
 
 /**
  * This class is the main entry point for this library. It is basically a wrapper around the [MunchProcessor] class.

@@ -108,15 +108,22 @@ class MunchConnection {
         return null
     }
 
+    /**
+     * This method is used to check if the data exists in the database.
+     *
+     * @param clazz The [MunchClass] instance to be used.
+     * @param value The value to be checked.
+     * @return If the data exists in the database.
+     * @since 1.0.0
+     */
     fun <T : Any, K : Any> hasData(clazz: MunchClass<T, K>, value: K): Boolean {
         val sql = clazz.generateSelect()
 
         try {
             val statement = connection.prepareStatement(sql)
-            statement.setString(1, value.toString())
+            setValue(statement, 1, value)
 
-            val resultSet = statement.executeQuery()
-            return resultSet.next()
+            return statement.executeQuery().next()
         } catch (e: SQLException) {
             e.printStackTrace()
         }
@@ -124,6 +131,13 @@ class MunchConnection {
         return false
     }
 
+    /**
+     * This method is used to insert data into the database.
+     *
+     * @param clazz The [MunchClass] instance to be used.
+     * @param obj The object to be inserted into the database.
+     * @since 1.0.0
+     */
     fun <T : Any, K : Any> addData(clazz: MunchClass<T, K>, obj: T) {
         val sql = clazz.generateInsert()
 
@@ -198,6 +212,11 @@ class MunchConnection {
         return null
     }
 
+    /**
+     * This method is used to close the connection to the database.
+     *
+     * @since 1.0.0
+     */
     private fun setValue(statement: PreparedStatement, index: Int, value: Any) {
         when (val clazz = value::class) {
             String::class -> statement.setString(index, value as String)

@@ -1,7 +1,7 @@
 package me.outspending.generator
 
+import me.outspending.Generator
 import me.outspending.MunchClass
-import me.outspending.generator.types.Generator
 
 /**
  * This class is used to generate the SQL for the data class.

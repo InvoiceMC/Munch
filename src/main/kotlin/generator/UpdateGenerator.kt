@@ -1,8 +1,8 @@
 package me.outspending.generator
 
+import me.outspending.AllGenerator
 import me.outspending.Column
 import me.outspending.MunchClass
-import me.outspending.generator.types.AllGenerator
 import kotlin.reflect.KProperty1
 
 /**

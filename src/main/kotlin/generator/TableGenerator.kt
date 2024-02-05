@@ -1,9 +1,9 @@
 package me.outspending.generator
 
+import me.outspending.AllGenerator
 import kotlin.reflect.KProperty1
 import me.outspending.Column
 import me.outspending.MunchClass
-import me.outspending.generator.types.AllGenerator
 
 /**
  * This extension function is used to generate the SQL for the data class.

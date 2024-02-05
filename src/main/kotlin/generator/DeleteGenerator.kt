@@ -1,8 +1,8 @@
 package me.outspending.generator
 
+import me.outspending.Generator
 import me.outspending.MunchClass
-import me.outspending.generator.types.Generator
-import me.outspending.generator.types.PrimaryGenerator
+import me.outspending.PrimaryGenerator
 
 /**
  * This extension function is used to generate the SQL for the data class.
