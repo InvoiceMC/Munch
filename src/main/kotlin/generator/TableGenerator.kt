@@ -3,9 +3,7 @@ package me.outspending.generator
 import kotlin.reflect.KProperty1
 import me.outspending.Column
 import me.outspending.MunchClass
-import me.outspending.generator.types.ColumnGenerator
-import me.outspending.generator.types.Generator
-import me.outspending.generator.types.PrimaryGenerator
+import me.outspending.generator.types.AllGenerator
 
 /**
  * This extension function is used to generate the SQL for the data class.
@@ -16,8 +14,7 @@ import me.outspending.generator.types.PrimaryGenerator
 fun <T : Any, K : Any> MunchClass<T, K>.generateTable(): String =
     generateCustom(TableGenerator(this))
 
-class TableGenerator<T : Any, K : Any>(clazz: MunchClass<T, K>) :
-    Generator<T>, PrimaryGenerator<T>, ColumnGenerator<T> {
+class TableGenerator<T : Any, K : Any>(clazz: MunchClass<T, K>) : AllGenerator<T> {
     private val builder = StringBuilder("CREATE TABLE IF NOT EXISTS ${clazz.clazz.simpleName} (")
 
     private val primaryKey = clazz.primaryKey
@@ -51,12 +48,11 @@ class TableGenerator<T : Any, K : Any>(clazz: MunchClass<T, K>) :
     }
 
     override fun handleColumn(property: KProperty1<out T, *>, column: Column) {
-        val name = column.name.ifEmpty { property.name }
         val type = column.type.value
         val constraints = column.constraints.toList()
 
         builder.apply {
-            append(", $name $type")
+            append(", ${property.name} $type")
             constraints.forEach { constraint -> append(" ${constraint.value}") }
         }
     }

@@ -1,6 +1,8 @@
 package me.outspending.test
 
-import me.outspending.*
+import me.outspending.Column
+import me.outspending.PrimaryKey
+import me.outspending.Table
 import me.outspending.enums.ColumnConstraint
 import me.outspending.enums.ColumnType
 
@@ -19,7 +21,7 @@ data class Test(
         type = ColumnType.INTEGER,
         constraints = [ColumnConstraint.NOTNULL, ColumnConstraint.UNIQUE]
     )
-    var age: Int
+    var age: Int,
 ) {
     constructor() : this(0, "", 0)
 }

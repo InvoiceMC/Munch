@@ -11,8 +11,7 @@ import java.io.IOException
 import java.sql.*
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
-import kotlin.reflect.full.createInstance
-import kotlin.reflect.full.memberProperties
+import kotlin.reflect.full.*
 import kotlin.reflect.jvm.isAccessible
 
 /**
@@ -131,27 +130,12 @@ class MunchConnection {
         try {
             val statement = connection.prepareStatement(sql)
 
-            for ((index, property) in obj::class.memberProperties.withIndex()) {
-                val value = property.getter.call(obj)
+            for ((index, property) in obj::class.java.declaredFields.withIndex()) {
+                property.isAccessible = true
+                println(property.name)
 
-                println("VALUE: $value // INDEX: ${index + 1}")
-                when (property.returnType.classifier) {
-                    String::class -> statement.setString(index + 1, value as String)
-                    Int::class -> statement.setInt(index + 1, value as Int)
-                    Long::class -> statement.setLong(index + 1, value as Long)
-                    Double::class -> statement.setDouble(index + 1, value as Double)
-                    Float::class -> statement.setFloat(index + 1, value as Float)
-                    Boolean::class -> statement.setBoolean(index + 1, value as Boolean)
-                    else -> {
-                        println("SERIALIZER")
-                        val serializer = SerializerFactory.getSerializer(property.returnType.classifier as KClass<*>)
-
-                        if (serializer != null) {
-                            val serializedValue = serializer.serialize(value)
-                            statement.setString(index + 1, serializedValue)
-                        }
-                    }
-                }
+                val value = property.get(obj)
+                value?.let { setValue(statement, index + 1, it) }
             }
 
             statement.executeUpdate()
@@ -172,22 +156,17 @@ class MunchConnection {
         val sql = clazz.generateSelect()
 
         try {
-            println(sql)
             val statement = connection.prepareStatement(sql)
             setValue(statement, 1, value)
 
             val resultSet = statement.executeQuery()
             if (!resultSet.next()) return null
 
-            println(resultSet)
             val obj = clazz.clazz.createInstance()
             for (property in obj::class.memberProperties) {
                 val mutableProperty = (property as? KMutableProperty1<T, *>) ?: continue
-                println(mutableProperty)
 
                 val setValue: (Any?) -> Unit = { newValue ->
-                    println("SETTING VALUE: $newValue")
-
                     mutableProperty.isAccessible = true
                     mutableProperty.setter.call(obj, newValue)
                 }
@@ -228,15 +207,13 @@ class MunchConnection {
             Float::class -> statement.setFloat(index, value as Float)
             Boolean::class -> statement.setBoolean(index, value as Boolean)
             else -> {
-                println("SERIALIZER")
                 val serializer = SerializerFactory.getSerializer(clazz as KClass<*>)
-
-                if (serializer != null) {
+                serializer?.let {
                     val serializedValue = serializer.serialize(value)
+
                     statement.setString(index, serializedValue)
                 }
             }
         }
     }
-
 }

@@ -76,11 +76,15 @@ class MunchProcessor<T : Any>(val munch: Munch<T>) {
      * @since 1.0
      */
     fun getColumns(): Map<KProperty1<out T, *>, Column>? {
+        val clazz = munch.getClass()
+        val fields = clazz.java.declaredFields
+        val orderByID = fields.withIndex().associate { it.value.name to it.index }
+
         val columns =
             munch
                 .getProperties()
                 .filter { it.annotations.any { annotation -> annotation is Column } }
-                .toList()
+                .sortedBy { orderByID[it.name] }
 
         if (columns.isEmpty()) return null
 

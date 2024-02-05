@@ -8,9 +8,8 @@ import kotlin.reflect.KClass
  *
  * @constructor Create empty Serializer factory
  * @see Serializer
- *
- * @since 1.0.0
  * @author Outspending
+ * @since 1.0.0
  */
 object SerializerFactory {
     private val serializers: MutableMap<Class<*>, Serializer<*>> = mutableMapOf()
@@ -20,8 +19,8 @@ object SerializerFactory {
      *
      * @param serializers The serializers to be registered.
      * @see Serializer
-     * @since 1.0.0
      * @author Outspending
+     * @since 1.0.0
      */
     fun registerSerializers(vararg serializers: Serializer<*>) =
         serializers.forEach { registerSerializer(it) }
@@ -32,43 +31,72 @@ object SerializerFactory {
      * @param subPackage The sub package of the serializers.
      * @param packageName The package of the serializers.
      * @see Serializer
-     * @since 1.0.0
      * @author Outspending
+     * @since 1.0.0
      */
-    fun registerSerializers(subPackage: String, packageName: String) = registerSerializers("$packageName.$subPackage")
+    fun registerSerializers(subPackage: String, packageName: String) =
+        registerSerializers("$packageName.$subPackage")
 
     /**
      * This method is used to register serializers.
      *
      * @param packageName The package of the serializers.
      * @see Serializer
-     *
-     * @since 1.0.0
      * @author Outspending
+     * @since 1.0.0
      */
     fun registerSerializers(packageName: String) =
-        Reflections(packageName)
-            .getSubTypesOf(Serializer::class.java)
-            .forEach {
-                val serializer = it.getDeclaredConstructor().newInstance() as Serializer<*>
-                registerSerializer(serializer)
-            }
+        Reflections(packageName).getSubTypesOf(Serializer::class.java).forEach {
+            val serializer = it.getDeclaredConstructor().newInstance() as Serializer<*>
+            registerSerializer(serializer)
+        }
 
     /**
      * This method is used to get a serializer.
      *
      * @param clazz The class of the object that you want to serialize and deserialize.
      * @return The serializer of the object that you want to serialize and deserialize.
-     *
      * @see Serializer
-     *
-     * @since 1.0.0
      * @author Outspending
+     * @since 1.0.0
      */
     @Suppress("UNCHECKED_CAST")
     fun <T : Any> getSerializer(clazz: KClass<T>): Serializer<T>? =
-        if (hasSerializer(clazz)) serializers[clazz.java] as Serializer<T>
-        else null
+        if (hasSerializer(clazz)) serializers[clazz.java] as Serializer<T> else null
+
+    /**
+     * This method is used to serialize an object.
+     *
+     * @param clazz The class of the object that you want to serialize and deserialize.
+     * @param value The object to be serialized.
+     * @return The serialized object.
+     * @see Serializer
+     * @author Outspending
+     * @since 1.0.0
+     */
+    fun <T : Any> serializeType(clazz: KClass<T>, value: T): String? {
+        val serializer = getSerializer(clazz)
+        serializer?.let { return it.serialize(value) }
+
+        return null
+    }
+
+    /**
+     * This method is used to deserialize a string.
+     *
+     * @param clazz The class of the object that you want to serialize and deserialize.
+     * @param value The string to be deserialized.
+     * @return The deserialized object.
+     * @see Serializer
+     * @author Outspending
+     * @since 1.0.0
+     */
+    fun <T : Any> deserializeType(clazz: KClass<T>, value: String): T? {
+        val serializer = getSerializer(clazz)
+        serializer?.let { return it.deserialize(value) }
+
+        return null
+    }
 
     /**
      * This method is used to check if a serializer exists.
@@ -76,18 +104,18 @@ object SerializerFactory {
      * @param clazz The class of the object that you want to serialize and deserialize.
      * @return True if the serializer exists, false otherwise.
      * @see Serializer
-     * @since 1.0.0
      * @author Outspending
+     * @since 1.0.0
      */
-    private fun hasSerializer(clazz: KClass<*>): Boolean = clazz.java in serializers
+    fun hasSerializer(clazz: KClass<*>): Boolean = clazz.java in serializers
 
     /**
      * This method is used to register a serializer.
      *
      * @param serializer The serializer to be registered.
      * @see Serializer
-     * @since 1.0.0
      * @author Outspending
+     * @since 1.0.0
      */
     private fun <T> registerSerializer(serializer: Serializer<T>) {
         val clazz = serializer.getSerializerClass()

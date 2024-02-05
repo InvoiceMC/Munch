@@ -44,7 +44,6 @@ annotation class PrimaryKey(
 @Target(AnnotationTarget.PROPERTY)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Column(
-    val name: String = "",
-    val type: ColumnType = ColumnType.TEXT,
+    val type: ColumnType = ColumnType.OTHER,
     val constraints: Array<ColumnConstraint> = []
 )

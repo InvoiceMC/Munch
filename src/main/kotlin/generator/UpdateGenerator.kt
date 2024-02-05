@@ -1,11 +1,9 @@
 package me.outspending.generator
 
-import kotlin.reflect.KProperty1
 import me.outspending.Column
 import me.outspending.MunchClass
-import me.outspending.generator.types.ColumnGenerator
-import me.outspending.generator.types.Generator
-import me.outspending.generator.types.PrimaryGenerator
+import me.outspending.generator.types.AllGenerator
+import kotlin.reflect.KProperty1
 
 /**
  * This extension function is used to generate the SQL for the data class.
@@ -17,8 +15,7 @@ import me.outspending.generator.types.PrimaryGenerator
 fun <T : Any, K : Any> MunchClass<T, K>.generateUpdate(): String =
     generateCustom(UpdateGenerator(this))
 
-class UpdateGenerator<T : Any, K : Any>(clazz: MunchClass<T, K>) :
-    Generator<T>, PrimaryGenerator<T>, ColumnGenerator<T> {
+class UpdateGenerator<T : Any, K : Any>(clazz: MunchClass<T, K>) : AllGenerator<T> {
     private val builder = StringBuilder("UPDATE ${clazz.getName()} SET ")
 
     private val primaryKey = clazz.primaryKey
