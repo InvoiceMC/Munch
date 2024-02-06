@@ -63,6 +63,7 @@ class TableGenerator<T : Any, K : Any>(clazz: MunchClass<T, K>) : AllGenerator<T
         return when (clazz.returnType.classifier as KClass<*>) {
             Byte::class, Int::class, Short::class -> "INTEGER"
             Double::class, Long::class, Float::class -> "REAL"
+            Boolean::class -> "NUMERIC"
             else -> "TEXT"
         }
     }
