@@ -9,7 +9,6 @@ package me.outspending.munch
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
-@MustBeDocumented
 annotation class Table
 
 /**
