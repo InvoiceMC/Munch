@@ -1,10 +1,9 @@
 package me.outspending.test
 
 import me.outspending.Column
+import me.outspending.ColumnConstraint
 import me.outspending.PrimaryKey
 import me.outspending.Table
-import me.outspending.enums.ColumnConstraint
-import me.outspending.enums.ColumnType
 
 /**
  * This is a test class
@@ -15,13 +14,9 @@ import me.outspending.enums.ColumnType
  */
 @Table
 data class Test(
-    @PrimaryKey(type = ColumnType.INTEGER, autoIncrement = true) var id: Int,
-    @Column(type = ColumnType.TEXT, constraints = [ColumnConstraint.NOTNULL]) var name: String,
-    @Column(
-        type = ColumnType.INTEGER,
-        constraints = [ColumnConstraint.NOTNULL, ColumnConstraint.UNIQUE]
-    )
-    var age: Int,
+    @PrimaryKey(autoIncrement = true) var id: Int,
+    @Column(constraints = [ColumnConstraint.NOTNULL]) var name: String,
+    @Column(constraints = [ColumnConstraint.NOTNULL, ColumnConstraint.UNIQUE]) var age: Int,
 ) {
     constructor() : this(0, "", 0)
 }

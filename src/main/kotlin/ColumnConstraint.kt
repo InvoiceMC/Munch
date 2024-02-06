@@ -1,4 +1,4 @@
-package me.outspending.enums
+package me.outspending
 
 /**
  * This class is for all the constraints that can be applied to a column. You can check what all of

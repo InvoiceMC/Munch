@@ -20,7 +20,6 @@ import kotlin.reflect.full.memberProperties
  * @see Generator
  * @see PrimaryKey
  * @see Column
- * @see ColumnType
  * @see ColumnConstraint
  * @see MunchProcessor
  * @see MunchClass
