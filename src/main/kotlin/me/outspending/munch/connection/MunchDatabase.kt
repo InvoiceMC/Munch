@@ -1,8 +1,8 @@
-package me.outspending.connection
+package me.outspending.munch.connection
 
-import me.outspending.Functions.runAsyncIf
-import me.outspending.MunchClass
-import me.outspending.generator.*
+import me.outspending.munch.Functions.runAsyncIf
+import me.outspending.munch.MunchClass
+import me.outspending.munch.generator.*
 import java.io.File
 import java.io.IOException
 import java.sql.Connection
@@ -173,7 +173,6 @@ class MunchDatabase : MunchConnection {
     override fun <T : Any, K : Any> updateData(clazz: MunchClass<T, K>, obj: T, key: K, runAsync: Boolean) {
         runAsyncIf(runAsync) {
             val sql = clazz.generateUpdate()
-            println(sql)
 
             runSQL(sql) { statement ->
                 val columns = clazz.columns.keys.toList()

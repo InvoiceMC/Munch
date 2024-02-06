@@ -1,8 +1,8 @@
-package me.outspending.generator
+package me.outspending.munch.generator
 
-import me.outspending.AllGenerator
-import me.outspending.Column
-import me.outspending.MunchClass
+import me.outspending.munch.AllGenerator
+import me.outspending.munch.Column
+import me.outspending.munch.MunchClass
 import kotlin.reflect.KProperty1
 
 /**

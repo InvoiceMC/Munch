@@ -1,4 +1,4 @@
-package me.outspending
+package me.outspending.munch
 
 import kotlin.reflect.KClass
 
@@ -10,7 +10,7 @@ object Functions {
     }
 
     inline fun <reified T> runAsync(crossinline block: () -> T): T? {
-        return runAsyncIf(true, block)
+        return me.outspending.munch.Functions.runAsyncIf(true, block)
     }
 
     inline fun <reified T> runAsyncIf(condition: Boolean, crossinline block: () -> T): T? {

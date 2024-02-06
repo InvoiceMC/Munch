@@ -1,5 +1,7 @@
-package me.outspending.connection
+package me.outspending.munch.connection
 
+import me.outspending.munch.MunchClass
+import me.outspending.munch.serializer.SerializerFactory
 import java.io.File
 import java.io.IOException
 import java.lang.reflect.Field
@@ -10,8 +12,6 @@ import kotlin.reflect.KProperty1
 import kotlin.reflect.full.*
 import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaField
-import me.outspending.MunchClass
-import me.outspending.serializer.SerializerFactory
 
 /**
  * This class is used to connect to Munch's SQLite database. You can also use your own connection if

@@ -1,4 +1,4 @@
-package me.outspending
+package me.outspending.munch
 
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
@@ -36,7 +36,7 @@ class MunchClass<T : Any, K : Any>(
      * @author Outspending
      * @since 1.0.0
      */
-    fun generateCustom(generator: Generator<T>): String = generator.generate()
+    fun generateCustom(generator: me.outspending.munch.Generator<T>): String = generator.generate()
 
     /**
      * This method is used to get the name of the data class.

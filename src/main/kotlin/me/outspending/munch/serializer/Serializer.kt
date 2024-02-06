@@ -1,4 +1,4 @@
-package me.outspending.serializer
+package me.outspending.munch.serializer
 
 /**
  * This is the serializer interface. This is used to serialize and deserialize objects.

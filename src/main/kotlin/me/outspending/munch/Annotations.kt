@@ -1,4 +1,4 @@
-package me.outspending
+package me.outspending.munch
 
 /**
  * This annotation is for the class that represents a table inside the database. This annotation is

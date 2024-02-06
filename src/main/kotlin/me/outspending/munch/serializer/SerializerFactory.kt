@@ -1,4 +1,4 @@
-package me.outspending.serializer
+package me.outspending.munch.serializer
 
 import org.reflections.Reflections
 import kotlin.reflect.KClass

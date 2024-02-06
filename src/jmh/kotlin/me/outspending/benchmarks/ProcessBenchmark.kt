@@ -1,16 +1,10 @@
 package me.outspending.benchmarks
 
-import me.outspending.Functions.toMunch
 import me.outspending.Munch
 import me.outspending.MunchClass
+import me.outspending.munch.Functions.toMunch
 import me.outspending.test.Test
-import org.openjdk.jmh.annotations.Benchmark
-import org.openjdk.jmh.annotations.BenchmarkMode
-import org.openjdk.jmh.annotations.Mode
-import org.openjdk.jmh.annotations.Scope
-import org.openjdk.jmh.annotations.State
-import org.openjdk.jmh.annotations.Warmup
-import org.openjdk.jmh.annotations.Measurement
+import org.openjdk.jmh.annotations.*
 
 @BenchmarkMode(Mode.AverageTime)
 @State(Scope.Benchmark)

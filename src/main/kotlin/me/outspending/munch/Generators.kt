@@ -1,6 +1,5 @@
-package me.outspending
+package me.outspending.munch
 
-import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 
 /**
