@@ -29,6 +29,17 @@ import kotlin.reflect.full.memberProperties
 class Munch<T : Any>(private val clazz: KClass<T>) {
     private val munchProcessor: MunchProcessor<T> = MunchProcessor(this)
 
+    companion object {
+        /**
+         * This method is used to create a [Munch] instance.
+         *
+         * @param clazz The data class to be used.
+         * @return A [Munch] instance.
+         * @since 1.0.0
+         */
+        fun <T : Any> create(clazz: KClass<T>): Munch<T> = Munch(clazz)
+    }
+
     /**
      * This method is used to process a [Munch] instance aka a data class that has the [Table]
      * annotation.
