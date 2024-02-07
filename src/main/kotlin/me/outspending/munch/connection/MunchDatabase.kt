@@ -36,7 +36,17 @@ class MunchDatabase : MunchConnection {
         }
     }
 
+    override fun disconnect() {
+        if (isConnected()) return
+
+        connection.close()
+    }
+
+    override fun isConnected(): Boolean = !connection.isClosed
+
     override fun <T : Any> runSQL(sql: String, execute: (PreparedStatement) -> T?): T? {
+        if (!isConnected()) throw SQLException("The connection is not open")
+
         try {
             val statement = connection.prepareStatement(sql)
             return execute(statement)

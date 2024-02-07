@@ -67,6 +67,27 @@ interface MunchConnection {
     fun connect(file: File, runAsync: Boolean = false)
 
     /**
+     * This method will disconnect the database from Munch. This can be useful if you want to close
+     * the connection to the database.
+     *
+     * @see MunchConnection
+     * @see MunchDatabase
+     * @author Outspending
+     * @since 1.0.0
+     */
+    fun disconnect()
+
+    /**
+     * This method is used to check if the connection is connected to the database.
+     *
+     * @return If the connection is connected to the database.
+     * @see MunchConnection
+     * @see MunchDatabase
+     * @since 1.0.0
+     */
+    fun isConnected(): Boolean
+
+    /**
      * This method is used to run custom SQL without any generators.
      *
      * @param sql The SQL to be executed.
