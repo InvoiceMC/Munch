@@ -1,6 +1,9 @@
 package me.outspending.munch.serializer
 
 import org.reflections.Reflections
+import org.reflections.scanners.Scanners
+import org.reflections.util.ClasspathHelper
+import org.reflections.util.ConfigurationBuilder
 import kotlin.reflect.KClass
 
 /**
@@ -46,10 +49,16 @@ object SerializerFactory {
      * @since 1.0.0
      */
     fun registerSerializers(packageName: String) =
-        Reflections(packageName).getSubTypesOf(Serializer::class.java).forEach {
-            val serializer = it.getDeclaredConstructor().newInstance() as Serializer<*>
-            registerSerializer(serializer)
-        }
+        Reflections(
+                ConfigurationBuilder()
+                    .setUrls(ClasspathHelper.forPackage(packageName))
+                    .setScanners(Scanners.SubTypes)
+            )
+            .getSubTypesOf(Serializer::class.java)
+            .forEach {
+                val serializer = it.getDeclaredConstructor().newInstance() as Serializer<*>
+                registerSerializer(serializer)
+            }
 
     /**
      * This method is used to get a serializer.
@@ -76,7 +85,9 @@ object SerializerFactory {
      */
     fun <T : Any> serializeType(clazz: KClass<T>, value: T): String? {
         val serializer = getSerializer(clazz)
-        serializer?.let { return it.serialize(value) }
+        serializer?.let {
+            return it.serialize(value)
+        }
 
         return null
     }
@@ -93,7 +104,9 @@ object SerializerFactory {
      */
     fun <T : Any> deserializeType(clazz: KClass<T>, value: String): T? {
         val serializer = getSerializer(clazz)
-        serializer?.let { return it.deserialize(value) }
+        serializer?.let {
+            return it.deserialize(value)
+        }
 
         return null
     }
