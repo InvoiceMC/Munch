@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "1.9.22"
     id("me.champeau.jmh") version "0.7.2"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 
     `maven-publish`
 }
@@ -39,6 +40,10 @@ tasks {
     wrapper {
         gradleVersion = "8.6"
         distributionType = Wrapper.DistributionType.ALL
+    }
+
+    shadowJar {
+        relocate("org.reflections", "me.outspending.munch.relocations.reflections")
     }
 }
 

@@ -51,7 +51,7 @@ object SerializerFactory {
     fun registerSerializers(packageName: String) =
         Reflections(
                 ConfigurationBuilder()
-                    .setUrls(ClasspathHelper.forPackage(packageName))
+                    .forPackage(packageName)
                     .setScanners(Scanners.SubTypes)
             )
             .getSubTypesOf(Serializer::class.java)
