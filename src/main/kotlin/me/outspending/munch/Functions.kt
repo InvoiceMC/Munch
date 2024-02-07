@@ -10,7 +10,7 @@ object Functions {
     }
 
     inline fun <reified T> runAsync(crossinline block: () -> T): T? {
-        return me.outspending.munch.Functions.runAsyncIf(true, block)
+        return runAsyncIf(true, block)
     }
 
     inline fun <reified T> runAsyncIf(condition: Boolean, crossinline block: () -> T): T? {

@@ -18,7 +18,7 @@ import kotlin.reflect.KProperty1
  * @author Outspending
  * @since 1.0
  */
-class MunchProcessor<T : Any>(val munch: me.outspending.munch.Munch<T>) {
+class MunchProcessor<T : Any>(val munch: Munch<T>) {
 
     /**
      * This method is used to process a [Munch] instance aka a data class that has the [Table]

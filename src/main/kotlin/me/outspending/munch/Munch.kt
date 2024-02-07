@@ -69,7 +69,7 @@ class Munch<T : Any>(private val clazz: KClass<T>) {
      * @author Outspending
      * @since 1.0.0
      */
-    fun isSQLType(): Boolean = clazz.annotations.any { it is me.outspending.munch.Table }
+    fun isSQLType(): Boolean = clazz.java.isAnnotationPresent(Table::class.java)
 
     /**
      * This method is used to get the class of the data class.
