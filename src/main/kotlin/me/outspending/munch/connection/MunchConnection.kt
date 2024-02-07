@@ -336,12 +336,18 @@ interface MunchConnection {
                 Float::class -> setValue(resultSet.getFloat(property.name))
                 Boolean::class -> setValue(resultSet.getBoolean(property.name))
                 else -> {
+                    println("GENERATING TYPE: USING SERIALIZER")
+                    val otherClass = property.returnType.classifier as KClass<*>
+                    println("$otherClass // ${otherClass.simpleName}")
                     val serializer =
-                        SerializerFactory.getSerializer(property.returnType.classifier as KClass<*>)
+                        SerializerFactory.getSerializer(otherClass)
+
+                    println(serializer)
                     serializer?.let {
                         val serializedValue = resultSet.getString(property.name)
                         val deserialized = serializer.deserialize(serializedValue)
 
+                        println(deserialized)
                         setValue(deserialized)
                     }
                 }

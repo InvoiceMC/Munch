@@ -61,8 +61,8 @@ class TableGenerator<T : Any, K : Any>(clazz: MunchClass<T, K>) : AllGenerator<T
 
     private fun getType(clazz: KProperty1<out T, *>): String {
         return when (clazz.returnType.classifier as KClass<*>) {
-            Byte::class, Int::class, Short::class -> "INTEGER"
-            Double::class, Long::class, Float::class -> "REAL"
+            Byte::class, Int::class, Short::class, Long::class -> "INTEGER"
+            Double::class, Float::class -> "REAL"
             Boolean::class -> "NUMERIC"
             else -> "TEXT"
         }
