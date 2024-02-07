@@ -42,3 +42,21 @@ M
 +src/main/kotlin/connection/MunchDatabase.kt,2\2\22451010ffb58ff996487bc023b2c4d11ea82078
 ;
 jitpack.yml,3\f\3f384c5ac91d01ea9ab11981ab87f1d958f63284
+h
+8src/main/kotlin/me/outspending/munch/ColumnConstraint.kt,6\3\635953ea88af98dc4386317730768fe84bf0257e
+c
+3src/main/kotlin/me/outspending/munch/Annotations.kt,4\c\4cc23493e2453d0f1f0ddd33555d358c3c701fb0
+b
+2src/main/kotlin/me/outspending/munch/ColumnType.kt,c\5\c5a29c2f0c68d9558803044f1c030be9e92269bc
+a
+1src/main/kotlin/me/outspending/munch/ValueType.kt,8\2\82170be19a22520674ebafb33af114562d862494
+b
+2src/main/kotlin/me/outspending/munch/MunchClass.kt,1\d\1d6c3b6d560c23d5e7ec6265ac64d3c7626cb7d8
+]
+-src/main/kotlin/me/outspending/munch/Munch.kt,0\4\04e35c12450e2f41323a041aeab99e75b9eba1e2
+f
+6src/main/kotlin/me/outspending/munch/MunchProcessor.kt,d\f\df2cd36c075284d5f7ec77bca06fffce67dfa045
+\
+,src/main/kotlin/me/outspending/munch/Main.kt,4\e\4edf66954efcfc897e4e7df2f240f8b4304c6835
+\
+,src/main/kotlin/me/outspending/munch/Test.kt,a\0\a0f7cfae5fb25e813730238f3bcd568a39f129c5

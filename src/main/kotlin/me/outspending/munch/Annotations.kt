@@ -9,7 +9,7 @@ package me.outspending.munch
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Table
+annotation class Table(val tableName: String = "")
 
 /**
  * This annotation represents the primary key inside the table. <br> For the primary key to work,
@@ -21,7 +21,7 @@ annotation class Table
  */
 @Target(AnnotationTarget.PROPERTY)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class PrimaryKey(val autoIncrement: Boolean = false)
+annotation class PrimaryKey(val type: ColumnType = ColumnType.NONE, val autoIncrement: Boolean = false)
 
 /**
  * This annotation represents the column inside the table. This is crucial for the processor to
@@ -34,4 +34,4 @@ annotation class PrimaryKey(val autoIncrement: Boolean = false)
  */
 @Target(AnnotationTarget.PROPERTY)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Column(val constraints: Array<ColumnConstraint> = [])
+annotation class Column(val type: ColumnType = ColumnType.NONE, val constraints: Array<ColumnConstraint> = [])

@@ -26,6 +26,7 @@ import kotlin.reflect.KProperty1
 class MunchClass<T : Any, K : Any>(
     val clazz: KClass<T>,
     val primaryKeyClass: KClass<K>,
+    val tableName: String,
     val primaryKey: Pair<KProperty1<out T, *>, PrimaryKey>,
     val columns: Map<KProperty1<out T, *>, Column>
 ) {

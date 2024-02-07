@@ -19,6 +19,11 @@ import kotlin.reflect.KProperty1
  * @since 1.0
  */
 class MunchProcessor<T : Any>(val munch: Munch<T>) {
+    private val tableName: String
+        get() =
+            (munch.getClass().annotations.first { it is Table } as Table).tableName.ifEmpty {
+                munch.getClass().simpleName!!
+            }
 
     /**
      * This method is used to process a [Munch] instance aka a data class that has the [Table]
@@ -40,7 +45,7 @@ class MunchProcessor<T : Any>(val munch: Munch<T>) {
         val columns = getColumns()
 
         val primaryKeyClass = primaryKey.first.returnType.classifier as KClass<K>
-        return MunchClass(munch.getClass(), primaryKeyClass, primaryKey, columns)
+        return MunchClass(munch.getClass(), primaryKeyClass, tableName, primaryKey, columns)
     }
 
     /**
@@ -52,15 +57,15 @@ class MunchProcessor<T : Any>(val munch: Munch<T>) {
      * @author Outspending
      * @since 1.0
      */
-    fun getPrimaryKey(): Pair<KProperty1<out T, *>, PrimaryKey> {
+    private fun getPrimaryKey(): Pair<KProperty1<out T, *>, PrimaryKey> {
         val primaryKey =
             munch
                 .getProperties()
                 .filter { it.annotations.any { annotation -> annotation is PrimaryKey } }
                 .toList()
 
-        if (primaryKey.size > 1) throw IllegalArgumentException("Multiple primary keys found")
-        if (primaryKey.isEmpty()) throw IllegalArgumentException("No primary key found")
+        require(primaryKey.isNotEmpty()) { "No primary key found!" }
+        require(primaryKey.size == 1) { "Multiple primary keys found!" }
 
         val main = primaryKey[0]
         return (main to main.annotations.first { it is PrimaryKey } as PrimaryKey)
@@ -74,7 +79,7 @@ class MunchProcessor<T : Any>(val munch: Munch<T>) {
      * @author Outspending
      * @since 1.0
      */
-    fun getColumns(): Map<KProperty1<out T, *>, Column> {
+    private fun getColumns(): Map<KProperty1<out T, *>, Column> {
         val clazz = munch.getClass()
         val fields = clazz.java.declaredFields
         val orderByID = fields.withIndex().associate { it.value.name to it.index }
@@ -85,7 +90,7 @@ class MunchProcessor<T : Any>(val munch: Munch<T>) {
                 .filter { it.annotations.any { annotation -> annotation is Column } }
                 .sortedBy { orderByID[it.name] }
 
-        if (columns.isEmpty()) throw IllegalArgumentException("No columns found")
+        require(columns.isNotEmpty()) { "No columns were found!" }
 
         return columns.associateWith {
             it.annotations.first { column -> column is Column } as Column
