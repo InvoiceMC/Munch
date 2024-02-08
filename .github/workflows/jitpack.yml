@@ -1,0 +1,19 @@
+name: Jitpack Build
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build and Push to Jitpack
+        run: |
+          curl -X POST "https://jitpack.io/api/builds/$GITHUB_REPOSITORY/$GITHUB_SHA"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
