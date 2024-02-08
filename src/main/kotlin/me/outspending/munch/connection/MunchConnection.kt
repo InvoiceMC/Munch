@@ -45,7 +45,7 @@ interface MunchConnection {
          * @author Outspending
          * @since 1.0.0
          */
-        fun <T : Any, K : Any> create(clazz: MunchClass<T, K>) =
+        fun create(clazz: MunchClass<*, *>) =
             MunchDatabase().apply {
                 connect()
                 createTable(clazz)
