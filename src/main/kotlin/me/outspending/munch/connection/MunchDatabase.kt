@@ -4,16 +4,11 @@ import me.outspending.munch.Functions.runAsyncIf
 import me.outspending.munch.MunchClass
 import me.outspending.munch.generator.*
 import java.io.File
-import java.io.IOException
-import java.sql.Connection
-import java.sql.DriverManager
 import java.sql.PreparedStatement
 import java.sql.SQLException
 
 class MunchDatabase : MunchConnection {
-    companion object {
-        private lateinit var connection: Connection
-    }
+    private val connection by lazy { ConnectionHandler.getConnection() }
 
     override fun connect(databaseName: String, runAsync: Boolean) =
         connect(File(databaseName), runAsync)
@@ -22,18 +17,7 @@ class MunchDatabase : MunchConnection {
         connect(File(parentPath, databaseName), runAsync)
 
     override fun connect(file: File, runAsync: Boolean) {
-        runAsyncIf(runAsync) {
-            try {
-                if (!file.exists()) {
-                    file.createNewFile()
-                }
-
-                val connectionURL = "jdbc:sqlite:${file.absolutePath}"
-                connection = DriverManager.getConnection(connectionURL)
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-        }
+        runAsyncIf(runAsync) { ConnectionHandler.connect(file) }
     }
 
     override fun disconnect() {
@@ -42,7 +26,7 @@ class MunchDatabase : MunchConnection {
         connection.close()
     }
 
-    override fun isConnected(): Boolean = !connection.isClosed
+    override fun isConnected(): Boolean = ConnectionHandler.isConnected()
 
     override fun <T : Any> runSQL(sql: String, execute: (PreparedStatement) -> T?): T? {
         if (!isConnected()) throw SQLException("The connection is not open")
@@ -180,7 +164,12 @@ class MunchDatabase : MunchConnection {
         }
     }
 
-    override fun <T : Any, K : Any> updateData(clazz: MunchClass<T, K>, obj: T, key: K, runAsync: Boolean) {
+    override fun <T : Any, K : Any> updateData(
+        clazz: MunchClass<T, K>,
+        obj: T,
+        key: K,
+        runAsync: Boolean
+    ) {
         runAsyncIf(runAsync) {
             val sql = clazz.generateUpdate()
 
@@ -191,20 +180,26 @@ class MunchDatabase : MunchConnection {
                 setValue(statement, currentIndex, key)
 
                 statement.execute()
-
             }
         }
     }
 
-    override fun <T : Any, K : Any> updateAllData(clazz: MunchClass<T, K>, obj: Array<T>, runAsync: Boolean) =
-        updateAllData(clazz, obj.toList(), runAsync)
+    override fun <T : Any, K : Any> updateAllData(
+        clazz: MunchClass<T, K>,
+        obj: Array<T>,
+        runAsync: Boolean
+    ) = updateAllData(clazz, obj.toList(), runAsync)
 
-    override fun <T : Any, K : Any> updateAllData(clazz: MunchClass<T, K>, obj: List<T>, runAsync: Boolean) {
+    override fun <T : Any, K : Any> updateAllData(
+        clazz: MunchClass<T, K>,
+        obj: List<T>,
+        runAsync: Boolean
+    ) {
         runAsyncIf(runAsync) {
             val sql = clazz.generateUpdate()
             runSQL(sql) { statement ->
                 for (data in obj) {
-                    val key = clazz.primaryKey.first.call(data) 
+                    val key = clazz.primaryKey.first.call(data)
                     val columns = clazz.columns.keys.toList()
 
                     val currentIndex = addKotlinValues(statement, data, columns)

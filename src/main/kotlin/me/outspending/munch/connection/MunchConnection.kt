@@ -32,6 +32,24 @@ interface MunchConnection {
          * @since 1.0.0
          */
         fun create(): MunchConnection = MunchDatabase()
+
+        /**
+         * This method does the same thing as [create] but it will also connect to the database and
+         * create the table for you without needing to call [connect] and [createTable]. This is
+         * mostly a QOL method.
+         *
+         * @param clazz The [MunchClass] instance to be used.
+         * @return A new instance of the [MunchConnection] interface.
+         * @see MunchConnection
+         * @see MunchClass
+         * @author Outspending
+         * @since 1.0.0
+         */
+        fun <T : Any, K : Any> create(clazz: MunchClass<T, K>) =
+            MunchDatabase().apply {
+                connect()
+                createTable(clazz)
+            }
     }
 
     /**

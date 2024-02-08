@@ -1,8 +1,6 @@
 package me.outspending.munch.generator
 
-import me.outspending.munch.AllGenerator
-import me.outspending.munch.Column
-import me.outspending.munch.MunchClass
+import me.outspending.munch.*
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 
@@ -35,11 +33,12 @@ class TableGenerator<T : Any, K : Any>(clazz: MunchClass<T, K>) : AllGenerator<T
         val primaryKey = primaryKey.second
 
         val hasAutoIncrement = primaryKey.autoIncrement
-        require(!(hasAutoIncrement && property.returnType.classifier != Int::class)) {
+        val classifier = property.returnType.classifier as KClass<*>
+        require(!(hasAutoIncrement && classifier != Int::class)) {
             "Auto increment can only be used on an int type!"
         }
 
-        val type = getType(property)
+        val type = getType(classifier)
         builder.append(
             "${property.name} $type PRIMARY KEY${if (hasAutoIncrement) " AUTOINCREMENT" else ""}"
         )
@@ -50,17 +49,27 @@ class TableGenerator<T : Any, K : Any>(clazz: MunchClass<T, K>) : AllGenerator<T
     }
 
     override fun handleColumn(property: KProperty1<out T, *>, column: Column) {
-        val type = getType(property)
-        val constraints = column.constraints
+        val columnType: ColumnType = column.columnType
+        val constraints: Array<ColumnConstraint> = column.constraints
 
+        val classifier = property.returnType.classifier as KClass<*>
+        if (columnType == ColumnType.NONE) {
+            val type = getType(classifier)
+            appendColumns(property.name, type, constraints)
+        } else {
+            appendColumns(property.name, columnType.value, constraints)
+        }
+    }
+
+    private fun appendColumns(name: String, type: String, constraints: Array<ColumnConstraint>) {
         builder.apply {
-            append(", ${property.name} $type")
+            append(", $name $type")
             constraints.forEach { constraint -> append(" ${constraint.value}") }
         }
     }
 
-    private fun getType(clazz: KProperty1<out T, *>): String {
-        return when (clazz.returnType.classifier as KClass<*>) {
+    private fun getType(classifier: KClass<*>): String {
+        return when (classifier) {
             Byte::class, Int::class, Short::class, Long::class -> "INTEGER"
             Double::class, Float::class -> "REAL"
             Boolean::class -> "NUMERIC"

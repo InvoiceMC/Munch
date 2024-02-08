@@ -44,8 +44,44 @@ class MunchProcessor<T : Any>(val munch: Munch<T>) {
         val primaryKey = getPrimaryKey()
         val columns = getColumns()
 
+        checkTypeConstraints(primaryKey, columns)
+
         val primaryKeyClass = primaryKey.first.returnType.classifier as KClass<K>
         return MunchClass(munch.getClass(), primaryKeyClass, tableName, primaryKey, columns)
+    }
+
+    /**
+     * Checks all the type constraints and checks if it has any unsupported types. If it does, it
+     * will throw an [IllegalArgumentException].
+     *
+     * @param primaryKey The primary key of the data class.
+     * @param columns The columns of the data class.
+     * @throws IllegalArgumentException If the type does not match the value type.
+     * @see PrimaryKey
+     * @see Column
+     * @see ColumnType
+     * @author Outspending
+     */
+    private fun checkTypeConstraints(
+        primaryKey: Pair<KProperty1<out T, *>, PrimaryKey>,
+        columns: Map<KProperty1<out T, *>, Column>
+    ) {
+        fun checkType(property: KProperty1<out T, *>, type: ColumnType): Boolean {
+            val classifier = property.returnType.classifier
+            return if (type != ColumnType.NONE) {
+
+                if (type.supportedValues.contains(classifier)) true
+                else
+                    throw IllegalArgumentException(
+                        "The type $classifier does not match the value type $type."
+                    )
+            } else {
+                true
+            }
+        }
+
+        checkType(primaryKey.first, primaryKey.second.columnType)
+        columns.forEach { (property, column) -> checkType(property, column.columnType) }
     }
 
     /**
