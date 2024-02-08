@@ -26,7 +26,7 @@ import kotlin.reflect.KProperty1
 class MunchClass<T : Any, K : Any>(
     val clazz: KClass<T>,
     val primaryKeyClass: KClass<K>,
-    val tableName: String,
+    private val tableName: String,
     val primaryKey: Pair<KProperty1<out T, *>, PrimaryKey>,
     val columns: Map<KProperty1<out T, *>, Column>
 ) {
@@ -46,7 +46,7 @@ class MunchClass<T : Any, K : Any>(
      * @author Outspending
      * @since 1.0.0
      */
-    fun getName() = clazz.simpleName
+    fun getName() = tableName
 
     /**
      * This method is used to get the number of values in the data class.
