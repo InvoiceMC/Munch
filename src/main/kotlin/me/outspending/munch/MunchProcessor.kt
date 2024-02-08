@@ -20,10 +20,7 @@ import kotlin.reflect.KProperty1
  */
 class MunchProcessor<T : Any>(val munch: Munch<T>) {
     private val tableName: String
-        get() =
-            (munch.getClass().annotations.first { it is Table } as Table).tableName.ifEmpty {
-                munch.getClass().simpleName!!
-            }
+        get() = tableName()
 
     /**
      * This method is used to process a [Munch] instance aka a data class that has the [Table]
@@ -131,5 +128,21 @@ class MunchProcessor<T : Any>(val munch: Munch<T>) {
         return columns.associateWith {
             it.annotations.first { column -> column is Column } as Column
         }
+    }
+
+    /**
+     * This method is used for getting the name of the table. This can be set using the [Table]
+     * annotation. If it isn't set in the annotation it will grab the data class's simple name
+     * instead.
+     *
+     * @see Table
+     * @author Outspending
+     * @since 1.0.0
+     */
+    private fun tableName(): String {
+        val clazz = munch.getClass()
+        val table = clazz.annotations.first { it is Table } as Table
+
+        return table.tableName.ifEmpty { clazz.simpleName!! }
     }
 }

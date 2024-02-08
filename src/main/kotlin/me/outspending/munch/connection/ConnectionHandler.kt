@@ -6,7 +6,7 @@ import java.sql.DriverManager
 import java.sql.SQLException
 
 /**
- * This class handles the connection to the database. This is used if there are multiple "datbase"
+ * This class handles the connection to the database. This is used if there are multiple "database"
  * classes that are needing to access this one connection.
  *
  * @author Outspending
