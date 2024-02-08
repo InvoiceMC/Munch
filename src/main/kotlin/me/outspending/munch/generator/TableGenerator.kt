@@ -53,12 +53,11 @@ class TableGenerator<T : Any, K : Any>(clazz: MunchClass<T, K>) : AllGenerator<T
         val constraints: Array<ColumnConstraint> = column.constraints
 
         val classifier = property.returnType.classifier as KClass<*>
-        if (columnType == ColumnType.NONE) {
-            val type = getType(classifier)
-            appendColumns(property.name, type, constraints)
-        } else {
-            appendColumns(property.name, columnType.value, constraints)
-        }
+        appendColumns(
+            property.name,
+            if (columnType == ColumnType.NONE) getType(classifier) else columnType.value,
+            constraints
+        )
     }
 
     private fun appendColumns(name: String, type: String, constraints: Array<ColumnConstraint>) {
@@ -70,11 +69,14 @@ class TableGenerator<T : Any, K : Any>(clazz: MunchClass<T, K>) : AllGenerator<T
 
     private fun getType(classifier: KClass<*>): String {
         return when (classifier) {
-            Byte::class, Int::class, Short::class, Long::class -> "INTEGER"
-            Double::class, Float::class -> "REAL"
+            Byte::class,
+            Int::class,
+            Short::class,
+            Long::class -> "INTEGER"
+            Double::class,
+            Float::class -> "REAL"
             Boolean::class -> "NUMERIC"
             else -> "TEXT"
         }
     }
-
 }
