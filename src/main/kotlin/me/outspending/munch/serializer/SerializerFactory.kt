@@ -50,12 +50,14 @@ object SerializerFactory {
     fun registerSerializers(packageName: String) =
         Reflections(
                 ConfigurationBuilder()
-                    .forPackage(packageName)
+                    .forPackages(packageName)
                     .setScanners(Scanners.SubTypes)
             )
             .getSubTypesOf(Serializer::class.java)
             .forEach {
                 val serializer = it.getDeclaredConstructor().newInstance() as Serializer<*>
+                println(serializer)
+
                 registerSerializer(serializer)
             }
 
