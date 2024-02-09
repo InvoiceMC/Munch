@@ -2,6 +2,7 @@ package me.outspending.munch
 
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
+import kotlin.reflect.full.memberProperties
 
 /**
  * This class is used to process all the annotations for a data class that has the [Table]
@@ -93,7 +94,8 @@ class MunchProcessor<T : Any>(val munch: Munch<T>) {
     private fun getPrimaryKey(): Pair<KProperty1<out T, *>, PrimaryKey> {
         val primaryKey =
             munch
-                .getProperties()
+                .getClass()
+                .memberProperties
                 .filter { it.annotations.any { annotation -> annotation is PrimaryKey } }
                 .toList()
 
