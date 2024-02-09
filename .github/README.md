@@ -33,7 +33,7 @@ data class PlayerData(
     @Column var name: String,
     @Column(constraints = [ColumnConstraint.NOTNULL]) var level: Int, // This will make the value NOT NULL in the SQLite database
     @Column(ColumnType.BOOLEAN) var isCool: Boolean, // Column types are types that are offered by SQLite to improve storage. If the column type isn't set it will still work just will use more storage
-) : Data {
+) {
     constructor() : this(0, "", false) // An empty constructor is REQUIRED for Munch to work properly
 }
 ```
