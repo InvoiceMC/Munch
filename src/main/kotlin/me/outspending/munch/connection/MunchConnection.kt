@@ -6,6 +6,7 @@ import java.io.File
 import java.io.IOException
 import java.lang.reflect.Field
 import java.sql.*
+import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty1
@@ -106,7 +107,7 @@ interface MunchConnection {
     fun isConnected(): Boolean
 
     /**
-     * This method is used to run custom SQL without any generators.
+     * This method is used to run custom getSQL without any generators.
      *
      * @param sql The SQL to be executed.
      * @param execute The lambda to execute the SQL.
@@ -132,7 +133,7 @@ interface MunchConnection {
      * @author Outspending
      * @since 1.0.0
      */
-    fun <T : Any, K : Any> getAllData(clazz: MunchClass<T, K>, runAsync: Boolean = false): List<T>?
+    fun <T : Any, K : Any> getAllData(clazz: MunchClass<T, K>, runAsync: Boolean = false): CompletableFuture<List<T>?>
 
     /**
      * This method is used to check if the data exists in the database.
@@ -147,7 +148,7 @@ interface MunchConnection {
         clazz: MunchClass<T, K>,
         value: K,
         runAsync: Boolean = false
-    ): Boolean?
+    ): CompletableFuture<Boolean?>
 
     /**
      * This method is used to insert data into the database.
@@ -199,7 +200,7 @@ interface MunchConnection {
      * @author Outspending
      * @since 1.0.0
      */
-    fun <T : Any, K : Any> getData(clazz: MunchClass<T, K>, value: K, runAsync: Boolean = false): T?
+    fun <T : Any, K : Any> getData(clazz: MunchClass<T, K>, value: K, runAsync: Boolean = false): CompletableFuture<T?>
 
     /**
      * This method is used to delete the whole table inside the database. This is useful for

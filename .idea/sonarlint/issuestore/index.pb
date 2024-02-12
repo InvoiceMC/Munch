@@ -16,8 +16,6 @@ c
 3src/main/kotlin/me/outspending/munch/Annotations.kt,4\c\4cc23493e2453d0f1f0ddd33555d358c3c701fb0
 b
 2src/main/kotlin/me/outspending/munch/ColumnType.kt,c\5\c5a29c2f0c68d9558803044f1c030be9e92269bc
-a
-1src/main/kotlin/me/outspending/munch/ValueType.kt,8\2\82170be19a22520674ebafb33af114562d862494
 b
 2src/main/kotlin/me/outspending/munch/MunchClass.kt,1\d\1d6c3b6d560c23d5e7ec6265ac64d3c7626cb7d8
 ]
@@ -30,3 +28,5 @@ t
 Dsrc/main/kotlin/me/outspending/munch/connection/ConnectionHandler.kt,1\4\144c1653ec230ba90927685c26073718f501dd43
 r
 Bsrc/main/kotlin/me/outspending/munch/connection/MunchConnection.kt,6\8\68d74c1d29be6ae884e1fab868f05de017190c58
+p
+@src/main/kotlin/me/outspending/munch/connection/MunchDatabase.kt,e\2\e24d8462e1ccf5027b0b4a03a60c883f2b1a258b

@@ -1,11 +1,12 @@
 package me.outspending.munch.connection
 
-import me.outspending.munch.Functions.runAsyncIf
-import me.outspending.munch.MunchClass
-import me.outspending.munch.generator.*
 import java.io.File
 import java.sql.PreparedStatement
 import java.sql.SQLException
+import java.util.concurrent.CompletableFuture
+import me.outspending.munch.Functions.runAsyncIf
+import me.outspending.munch.MunchClass
+import me.outspending.munch.generator.*
 
 class MunchDatabase : MunchConnection {
     private val connection by lazy { ConnectionHandler.getConnection() }
@@ -51,7 +52,7 @@ class MunchDatabase : MunchConnection {
     override fun <T : Any, K : Any> getAllData(
         clazz: MunchClass<T, K>,
         runAsync: Boolean
-    ): List<T>? {
+    ): CompletableFuture<List<T>?> {
         return runAsyncIf(runAsync) {
             val sql = clazz.generateSelectAll()
             runSQL(sql) { statement ->
@@ -71,7 +72,7 @@ class MunchDatabase : MunchConnection {
         clazz: MunchClass<T, K>,
         value: K,
         runAsync: Boolean
-    ): Boolean? {
+    ): CompletableFuture<Boolean?> {
         return runAsyncIf(runAsync) {
             val sql = clazz.generateSelect()
 
@@ -123,15 +124,17 @@ class MunchDatabase : MunchConnection {
         clazz: MunchClass<T, K>,
         value: K,
         runAsync: Boolean
-    ): T? {
-        val sql = clazz.generateSelect()
-        return runSQL(sql) { statement ->
-            setValue(statement, 1, value)
+    ): CompletableFuture<T?> {
+        return runAsyncIf(runAsync) {
+            val sql = clazz.generateSelect()
+            return@runAsyncIf runSQL(sql) { statement ->
+                setValue(statement, 1, value)
 
-            val resultSet = statement.executeQuery()
-            if (!resultSet.next()) return@runSQL null
+                val resultSet = statement.executeQuery()
+                if (!resultSet.next()) return@runSQL null
 
-            generateType(clazz.clazz, resultSet)
+                return@runSQL generateType(clazz.clazz, resultSet)
+            }
         }
     }
 
