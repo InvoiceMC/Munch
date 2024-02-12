@@ -20,7 +20,7 @@ interface AllGenerator<T : Any> : Generator<T>, ColumnGenerator<T>, PrimaryGener
  * @author Outspending
  * @since 1.0.0
  */
-interface Generator<T> {
+fun interface Generator<T> {
 
     /**
      * This method is used to generate the SQL for the data class.
@@ -39,7 +39,7 @@ interface Generator<T> {
  * @constructor Create empty Primary generator
  * @since 1.0.0
  */
-interface PrimaryGenerator<T : Any> {
+fun interface PrimaryGenerator<T : Any> {
     /**
      * This method is to handle the primary key of the data class. Which is passed in to the
      * [MunchClass] instance.

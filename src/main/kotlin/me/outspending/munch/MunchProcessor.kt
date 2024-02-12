@@ -61,17 +61,19 @@ class MunchProcessor<T : Any>(val munch: Munch<T>) {
      */
     private fun checkTypeConstraints(
         primaryKey: Pair<KProperty1<out T, *>, PrimaryKey>,
-        columns: Map<KProperty1<out T, *>, Column>
+        columns: Map<KProperty1<out T, *>, Column>,
     ) {
-        fun checkType(property: KProperty1<out T, *>, type: ColumnType): Boolean {
+        fun checkType(
+            property: KProperty1<out T, *>,
+            type: ColumnType,
+        ): Boolean {
             val classifier = property.returnType.classifier
             return if (type != ColumnType.NONE) {
+                require(type.supportedValues.contains(classifier)) {
+                    "The type $classifier does not match the value type of $type."
+                }
 
-                if (type.supportedValues.contains(classifier)) true
-                else
-                    throw IllegalArgumentException(
-                        "The type $classifier does not match the value type $type."
-                    )
+                true
             } else {
                 true
             }

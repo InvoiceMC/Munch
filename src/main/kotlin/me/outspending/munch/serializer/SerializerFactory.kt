@@ -36,8 +36,10 @@ object SerializerFactory {
      * @author Outspending
      * @since 1.0.0
      */
-    fun registerSerializers(subPackage: String, packageName: String) =
-        registerSerializers("$packageName.$subPackage")
+    fun registerSerializers(
+        subPackage: String,
+        packageName: String,
+    ) = registerSerializers("$packageName.$subPackage")
 
     /**
      * This method is used to register serializers.
@@ -49,13 +51,13 @@ object SerializerFactory {
      */
     fun registerSerializers(packageName: String) =
         Reflections(
-                ConfigurationBuilder()
-                    .forPackage(packageName)
-                    .setScanners(Scanners.SubTypes)
+                ConfigurationBuilder().forPackages(packageName).setScanners(Scanners.SubTypes),
             )
             .getSubTypesOf(Serializer::class.java)
             .forEach {
                 val serializer = it.getDeclaredConstructor().newInstance() as Serializer<*>
+                println(serializer)
+
                 registerSerializer(serializer)
             }
 
@@ -82,7 +84,10 @@ object SerializerFactory {
      * @author Outspending
      * @since 1.0.0
      */
-    fun <T : Any> serializeType(clazz: KClass<T>, value: T): String? {
+    fun <T : Any> serializeType(
+        clazz: KClass<T>,
+        value: T,
+    ): String? {
         val serializer = getSerializer(clazz)
         serializer?.let {
             return it.serialize(value)
@@ -101,7 +106,10 @@ object SerializerFactory {
      * @author Outspending
      * @since 1.0.0
      */
-    fun <T : Any> deserializeType(clazz: KClass<T>, value: String): T? {
+    fun <T : Any> deserializeType(
+        clazz: KClass<T>,
+        value: String,
+    ): T? {
         val serializer = getSerializer(clazz)
         serializer?.let {
             return it.deserialize(value)
