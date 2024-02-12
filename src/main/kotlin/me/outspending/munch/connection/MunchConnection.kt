@@ -303,7 +303,7 @@ interface MunchConnection {
         for ((index, field) in fields.withIndex()) {
             field.isAccessible = true
 
-            val value = field.get(obj)
+            val value = field[obj]
             value?.let { setValue(statement, index + 1, it) }
         }
 

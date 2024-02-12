@@ -6,11 +6,10 @@ plugins {
 }
 
 group = "org.github.invoicemc"
+
 version = "1.0-SNAPSHOT"
 
-repositories {
-    mavenCentral()
-}
+repositories { mavenCentral() }
 
 dependencies {
     implementation(kotlin("reflect"))
@@ -27,13 +26,7 @@ dependencies {
     jmh("org.openjdk.jmh:jmh-generator-bytecode:0.9")
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
-        }
-    }
-}
+publishing { publications { create<MavenPublication>("maven") { from(components["java"]) } } }
 
 tasks {
     wrapper {
@@ -42,6 +35,4 @@ tasks {
     }
 }
 
-kotlin {
-    jvmToolchain(17)
-}
+kotlin { jvmToolchain(17) }

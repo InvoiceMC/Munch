@@ -14,10 +14,7 @@ fun <T : Any, K : Any> MunchClass<T, K>.generateTable(): String =
     generateCustom(TableGenerator(this))
 
 class TableGenerator<T : Any, K : Any>(clazz: MunchClass<T, K>) : AllGenerator<T> {
-    private val builder =
-        StringBuilder(
-            "CREATE TABLE IF NOT EXISTS ${clazz.getName()} ("
-        )
+    private val builder = StringBuilder("CREATE TABLE IF NOT EXISTS ${clazz.getName()} (")
 
     private val primaryKey = clazz.primaryKey
     private val columns = clazz.columns

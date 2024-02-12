@@ -54,11 +54,11 @@ class Munch<T : Any>(private val clazz: KClass<T>) {
      * @since 1.0.0
      */
     fun <K : Any> process(): MunchClass<T, K> {
-        if (isSQLType() && clazz.isData) return munchProcessor.process()
-        else
-            throw IllegalArgumentException(
-                "The class must be a data class and have the Table annotation"
-            )
+        require(isSQLType() && clazz.isData) {
+            "The class must be a data class and have the Table annotation"
+        }
+
+        return munchProcessor.process()
     }
 
     /**
