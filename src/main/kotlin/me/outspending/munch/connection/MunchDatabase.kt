@@ -127,7 +127,7 @@ class MunchDatabase : MunchConnection {
     ): CompletableFuture<T?> {
         return runAsyncIf(runAsync) {
             val sql = clazz.generateSelect()
-            return@runAsyncIf runSQL(sql) { statement ->
+            runSQL(sql) { statement ->
                 setValue(statement, 1, value)
 
                 val resultSet = statement.executeQuery()

@@ -26,8 +26,10 @@ import kotlin.reflect.full.memberProperties
  * @author Outspending
  * @since 1.0.0
  */
-class Munch<T : Any>(private val clazz: KClass<T>) {
+class Munch<T : Any> private constructor(private val clazz: KClass<T>) {
     private val munchProcessor: MunchProcessor<T> = MunchProcessor(this)
+
+    internal val properties: Collection<KProperty1<out T, *>> by lazy { clazz.memberProperties }
 
     companion object {
         /**
@@ -78,12 +80,4 @@ class Munch<T : Any>(private val clazz: KClass<T>) {
      * @since 1.0.0
      */
     fun getClass(): KClass<T> = clazz
-
-    /**
-     * This method is used to get the properties of the data class.
-     *
-     * @return A collection of the properties of the data class.
-     * @since 1.0.0
-     */
-    fun getProperties(): Collection<KProperty1<out T, *>> = clazz.memberProperties
 }

@@ -95,7 +95,7 @@ class MunchProcessor<T : Any>(val munch: Munch<T>) {
     private fun getPrimaryKey(): Pair<KProperty1<out T, *>, PrimaryKey> {
         val primaryKey =
             munch
-                .getProperties()
+                .properties
                 .filter { it.annotations.any { annotation -> annotation is PrimaryKey } }
                 .toList()
 
@@ -121,7 +121,7 @@ class MunchProcessor<T : Any>(val munch: Munch<T>) {
 
         val columns =
             munch
-                .getProperties()
+                .properties
                 .filter { it.annotations.any { annotation -> annotation is Column } }
                 .sortedBy { orderByID[it.name] }
 
