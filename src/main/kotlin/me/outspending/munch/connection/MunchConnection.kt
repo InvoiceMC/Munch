@@ -8,10 +8,8 @@ import java.lang.reflect.Field
 import java.sql.*
 import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
-import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.*
-import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaField
 
 /**
@@ -133,7 +131,10 @@ interface MunchConnection {
      * @author Outspending
      * @since 1.0.0
      */
-    fun <T : Any, K : Any> getAllData(clazz: MunchClass<T, K>, runAsync: Boolean = false): CompletableFuture<List<T>?>
+    fun <T : Any, K : Any> getAllData(
+        clazz: MunchClass<T, K>,
+        runAsync: Boolean = false
+    ): CompletableFuture<List<T>?>
 
     /**
      * This method is used to check if the data exists in the database.
@@ -200,7 +201,11 @@ interface MunchConnection {
      * @author Outspending
      * @since 1.0.0
      */
-    fun <T : Any, K : Any> getData(clazz: MunchClass<T, K>, value: K, runAsync: Boolean = false): CompletableFuture<T?>
+    fun <T : Any, K : Any> getData(
+        clazz: MunchClass<T, K>,
+        value: K,
+        runAsync: Boolean = false
+    ): CompletableFuture<T?>
 
     /**
      * This method is used to delete the whole table inside the database. This is useful for
@@ -338,36 +343,22 @@ interface MunchConnection {
 
     @Suppress("UNCHECKED_CAST")
     fun <T : Any> generateType(clazz: KClass<T>, resultSet: ResultSet): T? {
-        val obj = clazz.createInstance()
-        for (property in obj::class.memberProperties) {
-            val mutableProperty = (property as? KMutableProperty1<T, *>) ?: continue
-
-            val setValue: (Any?) -> Unit = { newValue ->
-                mutableProperty.isAccessible = true
-                mutableProperty.setter.call(obj, newValue)
-            }
-
-            when (property.returnType.classifier) {
-                String::class -> setValue(resultSet.getString(property.name))
-                Int::class -> setValue(resultSet.getInt(property.name))
-                Long::class -> setValue(resultSet.getLong(property.name))
-                Double::class -> setValue(resultSet.getDouble(property.name))
-                Float::class -> setValue(resultSet.getFloat(property.name))
-                Boolean::class -> setValue(resultSet.getBoolean(property.name))
+        val constructor = clazz.primaryConstructor ?: return null
+        val parameters = constructor.parameters
+        val parameterValues = parameters.associateWith { parameter ->
+            when (parameter.type.classifier) {
+                String::class -> resultSet.getString(parameter.name)
+                Int::class -> resultSet.getInt(parameter.name)
+                Long::class -> resultSet.getLong(parameter.name)
+                Double::class -> resultSet.getDouble(parameter.name)
+                Float::class -> resultSet.getFloat(parameter.name)
+                Boolean::class -> resultSet.getBoolean(parameter.name)
                 else -> {
-                    val serializer =
-                        SerializerFactory.getSerializer(property.returnType.classifier as KClass<*>)
-
-                    serializer?.let {
-                        val serializedValue = resultSet.getString(property.name)
-                        val deserialized = serializer.deserialize(serializedValue)
-
-                        setValue(deserialized)
-                    }
+                    val serializer = SerializerFactory.getSerializer(parameter.type.classifier as KClass<*>)
+                    serializer?.deserialize(resultSet.getString(parameter.name))
                 }
             }
         }
-
-        return obj
+        return constructor.callBy(parameterValues)
     }
 }

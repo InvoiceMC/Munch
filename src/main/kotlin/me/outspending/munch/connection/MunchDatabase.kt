@@ -1,14 +1,14 @@
 package me.outspending.munch.connection
 
+import me.outspending.munch.Functions.runAsyncIf
+import me.outspending.munch.MunchClass
+import me.outspending.munch.generator.*
 import java.io.File
 import java.sql.PreparedStatement
 import java.sql.SQLException
 import java.util.concurrent.CompletableFuture
-import me.outspending.munch.Functions.runAsyncIf
-import me.outspending.munch.MunchClass
-import me.outspending.munch.generator.*
 
-class MunchDatabase : MunchConnection {
+class MunchDatabase internal constructor() : MunchConnection {
     private val connection by lazy { ConnectionHandler.getConnection() }
 
     override fun connect(databaseName: String, runAsync: Boolean) =
