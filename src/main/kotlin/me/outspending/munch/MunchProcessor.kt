@@ -19,8 +19,7 @@ import kotlin.reflect.KProperty1
  * @since 1.0
  */
 class MunchProcessor<T : Any>(val munch: Munch<T>) {
-    private val tableName: String
-        get() = tableName()
+    private val tableName: String by lazy { tableName() }
 
     /**
      * This method is used to process a [Munch] instance aka a data class that has the [Table]
