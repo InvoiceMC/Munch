@@ -19,18 +19,8 @@ import kotlin.reflect.jvm.javaField
  * @author Outspending
  * @since 1.0.0
  */
-interface MunchConnection {
+interface MunchConnection<K : Any, V : Any> {
     companion object {
-
-        /**
-         * This method is used to create a new instance of the [MunchConnection] interface.
-         *
-         * @return A new instance of the [MunchConnection] interface.
-         * @see MunchConnection
-         * @author Outspending
-         * @since 1.0.0
-         */
-        fun create(): MunchConnection = MunchDatabase()
 
         /**
          * This method does the same thing as [create] but it will also connect to the database and
@@ -44,11 +34,7 @@ interface MunchConnection {
          * @author Outspending
          * @since 1.0.0
          */
-        fun create(clazz: MunchClass<*, *>) =
-            MunchDatabase().apply {
-                connect()
-                createTable(clazz)
-            }
+        fun <K : Any, V : Any> create(clazz: MunchClass<K, V>) = MunchDatabase(clazz)
     }
 
     /**
@@ -121,7 +107,7 @@ interface MunchConnection {
      * @author Outspending
      * @since 1.0.0
      */
-    fun <T : Any, K : Any> createTable(clazz: MunchClass<T, K>, runAsync: Boolean = false)
+    fun createTable(runAsync: Boolean = false)
 
     /**
      * This method gets all the data from the database.
@@ -131,10 +117,7 @@ interface MunchConnection {
      * @author Outspending
      * @since 1.0.0
      */
-    fun <T : Any, K : Any> getAllData(
-        clazz: MunchClass<T, K>,
-        runAsync: Boolean = false
-    ): CompletableFuture<List<T>?>
+    fun getAllData(runAsync: Boolean = false): CompletableFuture<List<V>?>
 
     /**
      * This method is used to check if the data exists in the database.
@@ -145,11 +128,7 @@ interface MunchConnection {
      * @author Outspending
      * @since 1.0.0
      */
-    fun <T : Any, K : Any> hasData(
-        clazz: MunchClass<T, K>,
-        value: K,
-        runAsync: Boolean = false
-    ): CompletableFuture<Boolean?>
+    fun hasData(value: V, runAsync: Boolean = false): CompletableFuture<Boolean?>
 
     /**
      * This method is used to insert data into the database.
@@ -159,7 +138,7 @@ interface MunchConnection {
      * @author Outspending
      * @since 1.0.0
      */
-    fun <T : Any, K : Any> addData(clazz: MunchClass<T, K>, obj: T, runAsync: Boolean = false)
+    fun addData(obj: K, runAsync: Boolean = false)
 
     /**
      * This method is used to insert data into the database.
@@ -171,11 +150,7 @@ interface MunchConnection {
      * @see MunchClass
      * @since 1.0.0
      */
-    fun <T : Any, K : Any> addAllData(
-        clazz: MunchClass<T, K>,
-        obj: Array<T>,
-        runAsync: Boolean = false
-    )
+    fun addAllData(obj: Array<K>, runAsync: Boolean = false)
 
     /**
      * This method is used to insert data into the database.
@@ -187,11 +162,7 @@ interface MunchConnection {
      * @see MunchClass
      * @since 1.0.0
      */
-    fun <T : Any, K : Any> addAllData(
-        clazz: MunchClass<T, K>,
-        obj: List<T>,
-        runAsync: Boolean = false
-    )
+    fun addAllData(obj: List<K>, runAsync: Boolean = false)
 
     /**
      * This method is used to insert data into the database.
@@ -201,11 +172,7 @@ interface MunchConnection {
      * @author Outspending
      * @since 1.0.0
      */
-    fun <T : Any, K : Any> getData(
-        clazz: MunchClass<T, K>,
-        value: K,
-        runAsync: Boolean = false
-    ): CompletableFuture<T?>
+    fun getData(value: V, runAsync: Boolean = false): CompletableFuture<K?>
 
     /**
      * This method is used to delete the whole table inside the database. This is useful for
@@ -218,7 +185,7 @@ interface MunchConnection {
      * @author Outspending
      * @since 1.0.0
      */
-    fun <T : Any, K : Any> deleteTable(clazz: MunchClass<T, K>, runAsync: Boolean = false)
+    fun deleteTable(runAsync: Boolean = false)
 
     /**
      * This method is used to delete all the data from the database.
@@ -229,7 +196,7 @@ interface MunchConnection {
      * @see MunchClass
      * @since 1.0.0
      */
-    fun <T : Any, K : Any> deleteAllData(clazz: MunchClass<T, K>, runAsync: Boolean = false)
+    fun deleteAllData(runAsync: Boolean = false)
 
     /**
      * This method is used to delete data from the database.
@@ -241,7 +208,7 @@ interface MunchConnection {
      * @see MunchClass
      * @since 1.0.0
      */
-    fun <T : Any, K : Any> deleteData(clazz: MunchClass<T, K>, value: K, runAsync: Boolean = false)
+    fun deleteData(value: V, runAsync: Boolean = false)
 
     /**
      * This method is used to update data in the database.
@@ -253,12 +220,7 @@ interface MunchConnection {
      * @see MunchClass
      * @since 1.0.0
      */
-    fun <T : Any, K : Any> updateData(
-        clazz: MunchClass<T, K>,
-        obj: T,
-        key: K,
-        runAsync: Boolean = false
-    )
+    fun updateData(obj: K, value: V, runAsync: Boolean = false)
 
     /**
      * This method is used to update data in the database.
@@ -270,11 +232,7 @@ interface MunchConnection {
      * @see MunchClass
      * @since 1.0.0
      */
-    fun <T : Any, K : Any> updateAllData(
-        clazz: MunchClass<T, K>,
-        obj: Array<T>,
-        runAsync: Boolean = false
-    )
+    fun updateAllData(obj: Array<K>, runAsync: Boolean = false)
 
     /**
      * This method is used to update data in the database.
@@ -286,11 +244,7 @@ interface MunchConnection {
      * @see MunchClass
      * @since 1.0.0
      */
-    fun <T : Any, K : Any> updateAllData(
-        clazz: MunchClass<T, K>,
-        obj: List<T>,
-        runAsync: Boolean = false
-    )
+    fun updateAllData(obj: List<K>, runAsync: Boolean = false)
 
     fun addValue(statement: PreparedStatement, obj: Any): Int {
         val fields = obj::class.java.declaredFields
@@ -341,24 +295,25 @@ interface MunchConnection {
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
     fun <T : Any> generateType(clazz: KClass<T>, resultSet: ResultSet): T? {
         val constructor = clazz.primaryConstructor ?: return null
         val parameters = constructor.parameters
-        val parameterValues = parameters.associateWith { parameter ->
-            when (parameter.type.classifier) {
-                String::class -> resultSet.getString(parameter.name)
-                Int::class -> resultSet.getInt(parameter.name)
-                Long::class -> resultSet.getLong(parameter.name)
-                Double::class -> resultSet.getDouble(parameter.name)
-                Float::class -> resultSet.getFloat(parameter.name)
-                Boolean::class -> resultSet.getBoolean(parameter.name)
-                else -> {
-                    val serializer = SerializerFactory.getSerializer(parameter.type.classifier as KClass<*>)
-                    serializer?.deserialize(resultSet.getString(parameter.name))
+        val parameterValues =
+            parameters.associateWith { parameter ->
+                when (parameter.type.classifier) {
+                    String::class -> resultSet.getString(parameter.name)
+                    Int::class -> resultSet.getInt(parameter.name)
+                    Long::class -> resultSet.getLong(parameter.name)
+                    Double::class -> resultSet.getDouble(parameter.name)
+                    Float::class -> resultSet.getFloat(parameter.name)
+                    Boolean::class -> resultSet.getBoolean(parameter.name)
+                    else -> {
+                        val serializer =
+                            SerializerFactory.getSerializer(parameter.type.classifier as KClass<*>)
+                        serializer?.deserialize(resultSet.getString(parameter.name))
+                    }
                 }
             }
-        }
         return constructor.callBy(parameterValues)
     }
 }

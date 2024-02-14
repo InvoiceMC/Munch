@@ -30,3 +30,5 @@ l
 <src/jmh/kotlin/me/outspending/benchmarks/ProcessBenchmark.kt,f\1\f1f55da8b7fb1f25de4ea35011903df66c75e05a
 `
 0src/jmh/kotlin/me/outspending/benchmarks/Test.kt,5\7\574dd6bf3b1a9edb93e200d589965c663707f325
+\
+,src/main/kotlin/me/outspending/munch/Test.kt,a\0\a0f7cfae5fb25e813730238f3bcd568a39f129c5
