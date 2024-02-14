@@ -117,7 +117,7 @@ interface MunchConnection<K : Any, V : Any> {
      * @author Outspending
      * @since 1.0.0
      */
-    fun getAllData(runAsync: Boolean = false): CompletableFuture<List<V>?>
+    fun getAllData(runAsync: Boolean = false): CompletableFuture<List<K>?>
 
     /**
      * This method is used to check if the data exists in the database.

@@ -60,16 +60,15 @@ class MunchDatabase<K : Any, V : Any> internal constructor(private val clazz: Mu
     override fun createTable(runAsync: Boolean) {
         runAsyncIf(runAsync) { runSQL(tableSQL) { statement -> statement.execute() } }
     }
-
-    @Suppress("UNCHECKED_CAST")
-    override fun getAllData(runAsync: Boolean): CompletableFuture<List<V>?> {
+    
+    override fun getAllData(runAsync: Boolean): CompletableFuture<List<K>?> {
         return runAsyncIf(runAsync) {
             runSQL(selectAllSQL) { statement ->
                 val resultSet = statement.executeQuery()
 
-                val list = mutableListOf<V>()
+                val list = mutableListOf<K>()
                 while (resultSet.next()) {
-                    generateType(clazz.clazz, resultSet)?.let { list.add(it as V) }
+                    generateType(clazz.clazz, resultSet)?.let { list.add(it) }
                 }
 
                 list
