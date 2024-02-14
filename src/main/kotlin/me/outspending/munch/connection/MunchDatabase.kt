@@ -1,13 +1,13 @@
 package me.outspending.munch.connection
 
-import me.outspending.munch.Functions.runAsyncIf
-import me.outspending.munch.MunchClass
-import me.outspending.munch.generator.*
 import java.io.File
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.SQLException
 import java.util.concurrent.CompletableFuture
+import me.outspending.munch.Functions.runAsyncIf
+import me.outspending.munch.MunchClass
+import me.outspending.munch.generator.*
 
 class MunchDatabase<K : Any, V : Any> internal constructor(private val clazz: MunchClass<K, V>) :
     MunchConnection<K, V> {
@@ -126,15 +126,11 @@ class MunchDatabase<K : Any, V : Any> internal constructor(private val clazz: Mu
     }
 
     override fun deleteTable(runAsync: Boolean) {
-        runAsyncIf(runAsync) {
-            runSQL(deleteTableSQL) { statement -> statement.execute() }
-        }
+        runAsyncIf(runAsync) { runSQL(deleteTableSQL) { statement -> statement.execute() } }
     }
 
     override fun deleteAllData(runAsync: Boolean) {
-        runAsyncIf(runAsync) {
-            runSQL(deleteAllSQL) { statement -> statement.execute() }
-        }
+        runAsyncIf(runAsync) { runSQL(deleteAllSQL) { statement -> statement.execute() } }
     }
 
     override fun deleteData(value: V, runAsync: Boolean) {
