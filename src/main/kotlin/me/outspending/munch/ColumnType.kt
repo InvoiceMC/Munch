@@ -216,6 +216,7 @@ enum class ColumnType(val value: String, val supportedValues: List<KClass<*>>) {
      * @author Outspending
      * @since 1.0.0
      */
+    @Deprecated("Has been removed to its own type, no longer need to call this")
     BOOLEAN("BOOLEAN", listOf(Boolean::class)),
     /**
      * This column type is for storing dates. Which is "DATE" in SQLite. Currently, this type
