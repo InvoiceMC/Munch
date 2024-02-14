@@ -24,7 +24,7 @@ class MunchDatabase<K : Any, V : Any> internal constructor(private val clazz: Mu
     private val deleteAllSQL: String by lazy { clazz.generateDeleteAll() }
     private val deleteSQL: String by lazy { clazz.generateDelete() }
 
-    private val connection: Connection = ConnectionHandler.getConnection()
+    private val connection: Connection by lazy { ConnectionHandler.getConnection() }
 
     override fun connect(databaseName: String, runAsync: Boolean) =
         connect(File(databaseName), runAsync)
@@ -60,7 +60,7 @@ class MunchDatabase<K : Any, V : Any> internal constructor(private val clazz: Mu
     override fun createTable(runAsync: Boolean) {
         runAsyncIf(runAsync) { runSQL(tableSQL) { statement -> statement.execute() } }
     }
-    
+
     override fun getAllData(runAsync: Boolean): CompletableFuture<List<K>?> {
         return runAsyncIf(runAsync) {
             runSQL(selectAllSQL) { statement ->
