@@ -11,6 +11,18 @@ import java.util.concurrent.CompletableFuture
 private val connection: Connection by lazy { ConnectionHandler.getConnection() }
 
 class GlobalDatabase internal constructor() : MunchConnection {
+    companion object {
+        private lateinit var instance: GlobalDatabase
+
+        fun getInstance(): GlobalDatabase {
+            if (!this::instance.isInitialized) {
+                instance = GlobalDatabase()
+            }
+
+            return instance
+        }
+    }
+
     override fun connect(databaseName: String, runAsync: Boolean) =
         connect(File(databaseName), runAsync)
 

@@ -6,7 +6,7 @@ import java.sql.PreparedStatement
 import java.util.concurrent.CompletableFuture
 
 class MunchDatabase<K : Any, V : Any> internal constructor(private val clazz: MunchClass<K, V>) {
-    private val database = GlobalDatabase()
+    private val database = GlobalDatabase.getInstance()
 
     fun connect(databaseName: String, runAsync: Boolean) = connect(File(databaseName), runAsync)
 

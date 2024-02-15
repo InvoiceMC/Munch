@@ -48,7 +48,7 @@ interface MunchConnection {
          * @author Outspending
          * @since 1.0.0
          */
-        fun global() = GlobalDatabase()
+        fun global() = GlobalDatabase.getInstance()
     }
 
     /**
