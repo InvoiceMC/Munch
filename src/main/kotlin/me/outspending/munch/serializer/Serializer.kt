@@ -10,7 +10,7 @@ import kotlin.reflect.KClass
  * @author Outspending
  * @since 1.0.0
  */
-interface Serializer<T> {
+interface Serializer<K> {
     /**
      * This method is used to get the class of the object that you want to serialize and
      * deserialize.
@@ -23,7 +23,7 @@ interface Serializer<T> {
      * @since 1.0.0
      * @since 1.0.0
      */
-    fun getSerializerClass(): Class<T>
+    fun getSerializerClass(): Class<K>
 
     /**
      * This method is used to serialize an object.
@@ -47,7 +47,7 @@ interface Serializer<T> {
      * @author Outspending
      * @since 1.0.0
      */
-    fun deserialize(str: String): T
+    fun deserialize(str: String): K
 
     /**
      * This method is to grab a serializer with the specified class.

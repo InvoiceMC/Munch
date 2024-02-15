@@ -39,7 +39,7 @@ fun interface Generator<T> {
  * @constructor Create empty Primary generator
  * @since 1.0.0
  */
-fun interface PrimaryGenerator<T : Any> {
+fun interface PrimaryGenerator<K : Any> {
     /**
      * This method is to handle the primary key of the data class. Which is passed in to the
      * [MunchClass] instance.
@@ -61,7 +61,7 @@ fun interface PrimaryGenerator<T : Any> {
  * @constructor Create empty Column generator
  * @since 1.0.0
  */
-interface ColumnGenerator<T : Any> {
+interface ColumnGenerator<K : Any> {
     /**
      * This method is to handle the columns of the data class. Which is passed in to the
      * [MunchClass] instance.
@@ -86,5 +86,5 @@ interface ColumnGenerator<T : Any> {
      * @author Outspending
      * @since 1.0.0
      */
-    fun handleColumn(property: KProperty1<out T, *>, column: Column)
+    fun handleColumn(property: KProperty1<out K, *>, column: Column)
 }

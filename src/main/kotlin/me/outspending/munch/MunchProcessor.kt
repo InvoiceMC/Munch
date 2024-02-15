@@ -18,7 +18,7 @@ import kotlin.reflect.KProperty1
  * @author Outspending
  * @since 1.0
  */
-class MunchProcessor<T : Any>(val munch: Munch<T>) {
+class MunchProcessor<K : Any>(val munch: Munch<K>) {
     private val tableName: String by lazy { tableName() }
 
     /**
@@ -36,14 +36,13 @@ class MunchProcessor<T : Any>(val munch: Munch<T>) {
      * @since 1.0
      */
     @Suppress("UNCHECKED_CAST")
-    fun <K : Any> process(): MunchClass<T, K> {
+    fun <V : Any> process(): MunchClass<K, V> {
         val primaryKey = getPrimaryKey()
         val columns = getColumns()
 
         checkTypeConstraints(primaryKey, columns)
 
-        val primaryKeyClass = primaryKey.first.returnType.classifier as KClass<K>
-        return MunchClass(munch.getClass(), primaryKeyClass, tableName, primaryKey, columns)
+        return MunchClass(munch.getClass(), tableName, primaryKey, columns)
     }
 
     /**
@@ -59,11 +58,11 @@ class MunchProcessor<T : Any>(val munch: Munch<T>) {
      * @author Outspending
      */
     private fun checkTypeConstraints(
-        primaryKey: Pair<KProperty1<out T, *>, PrimaryKey>,
-        columns: Map<KProperty1<out T, *>, Column>,
+        primaryKey: Pair<KProperty1<out K, *>, PrimaryKey>,
+        columns: Map<KProperty1<out K, *>, Column>,
     ) {
         fun checkType(
-            property: KProperty1<out T, *>,
+            property: KProperty1<out K, *>,
             type: ColumnType,
         ): Boolean {
             val classifier = property.returnType.classifier
@@ -91,7 +90,7 @@ class MunchProcessor<T : Any>(val munch: Munch<T>) {
      * @author Outspending
      * @since 1.0
      */
-    private fun getPrimaryKey(): Pair<KProperty1<out T, *>, PrimaryKey> {
+    private fun getPrimaryKey(): Pair<KProperty1<out K, *>, PrimaryKey> {
         val primaryKey =
             munch
                 .properties
@@ -113,7 +112,7 @@ class MunchProcessor<T : Any>(val munch: Munch<T>) {
      * @author Outspending
      * @since 1.0
      */
-    private fun getColumns(): Map<KProperty1<out T, *>, Column> {
+    private fun getColumns(): Map<KProperty1<out K, *>, Column> {
         val clazz = munch.getClass()
         val fields = clazz.java.declaredFields
         val orderByID = fields.withIndex().associate { it.value.name to it.index }

@@ -1,5 +1,6 @@
 package me.outspending.munch
 
+import me.outspending.munch.generator.*
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 
@@ -23,13 +24,24 @@ import kotlin.reflect.KProperty1
  * @author Outspending
  * @since 1.0.0
  */
-class MunchClass<T : Any, K : Any>(
-    val clazz: KClass<T>,
-    val primaryKeyClass: KClass<K>,
+class MunchClass<K : Any, V : Any>(
+    val clazz: KClass<K>,
     private val tableName: String,
-    val primaryKey: Pair<KProperty1<out T, *>, PrimaryKey>,
-    val columns: Map<KProperty1<out T, *>, Column>
+    val primaryKey: Pair<KProperty1<out K, *>, PrimaryKey>,
+    val columns: Map<KProperty1<out K, *>, Column>
 ) {
+    val tableSQL: String by lazy { this.generateTable() }
+
+    val selectAllSQL: String by lazy { this.generateSelectAll() }
+    val selectSQL: String by lazy { this.generateSelect() }
+
+    val updateSQL: String by lazy { this.generateUpdate() }
+    val insertSQL: String by lazy { this.generateInsert() }
+
+    val deleteTableSQL: String by lazy { this.generateDeleteTable() }
+    val deleteAllSQL: String by lazy { this.generateDeleteAll() }
+    val deleteSQL: String by lazy { this.generateDelete() }
+
     /**
      * This method is used to execute a custom generator. This is also used for all the main
      * generators. This method is used to generate the SQL for the data class.
@@ -37,7 +49,7 @@ class MunchClass<T : Any, K : Any>(
      * @author Outspending
      * @since 1.0.0
      */
-    fun generateCustom(generator: Generator<T>): String = generator.generate()
+    fun generateCustom(generator: Generator<K>): String = generator.generate()
 
     /**
      * This method is used to get the name of the data class.

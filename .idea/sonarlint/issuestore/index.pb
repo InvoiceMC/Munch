@@ -40,3 +40,7 @@ m
 =src/main/kotlin/me/outspending/munch/serializer/Serializer.kt,d\3\d39aa58e0816af894662936e3b3aa6539262173d
 `
 0src/jmh/kotlin/me/outspending/benchmarks/Test.kt,5\7\574dd6bf3b1a9edb93e200d589965c663707f325
+\
+,src/main/kotlin/me/outspending/munch/Test.kt,a\0\a0f7cfae5fb25e813730238f3bcd568a39f129c5
+b
+2src/main/kotlin/me/outspending/munch/Generators.kt,6\f\6f144ae6943cce450550ae170e23e7c24013418a

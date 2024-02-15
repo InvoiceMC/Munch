@@ -26,10 +26,10 @@ import kotlin.reflect.full.memberProperties
  * @author Outspending
  * @since 1.0.0
  */
-class Munch<T : Any> private constructor(private val clazz: KClass<T>) {
-    private val munchProcessor: MunchProcessor<T> = MunchProcessor(this)
+class Munch<K : Any> private constructor(private val clazz: KClass<K>) {
+    private val munchProcessor: MunchProcessor<K> = MunchProcessor(this)
 
-    internal val properties: Collection<KProperty1<out T, *>> by lazy { clazz.memberProperties }
+    internal val properties: Collection<KProperty1<out K, *>> by lazy { clazz.memberProperties }
 
     companion object {
         /**
@@ -55,7 +55,7 @@ class Munch<T : Any> private constructor(private val clazz: KClass<T>) {
      * @see Generator
      * @since 1.0.0
      */
-    fun <K : Any> process(): MunchClass<T, K> {
+    fun <V : Any> process(): MunchClass<K, V> {
         require(isSQLType() && clazz.isData) {
             "The class must be a data class and have the Table annotation"
         }
@@ -79,5 +79,5 @@ class Munch<T : Any> private constructor(private val clazz: KClass<T>) {
      * @return The class of the data class.
      * @since 1.0.0
      */
-    fun getClass(): KClass<T> = clazz
+    fun getClass(): KClass<K> = clazz
 }

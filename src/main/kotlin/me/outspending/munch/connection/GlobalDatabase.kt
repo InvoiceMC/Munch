@@ -2,36 +2,34 @@ package me.outspending.munch.connection
 
 import me.outspending.munch.Functions.runAsyncIf
 import me.outspending.munch.MunchClass
-import me.outspending.munch.generator.*
 import java.io.File
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.SQLException
 import java.util.concurrent.CompletableFuture
 
-class GlobalDatabase<K : Any, V : Any> {
-    companion object {
-        private val connection: Connection by lazy { ConnectionHandler.getConnection() }
-    }
+private val connection: Connection by lazy { ConnectionHandler.getConnection() }
 
-    fun connect(databaseName: String, runAsync: Boolean) = connect(File(databaseName), runAsync)
+class GlobalDatabase internal constructor() : MunchConnection {
+    override fun connect(databaseName: String, runAsync: Boolean) =
+        connect(File(databaseName), runAsync)
 
-    fun connect(parentPath: File, databaseName: String, runAsync: Boolean) =
+    override fun connect(parentPath: File, databaseName: String, runAsync: Boolean) =
         connect(File(parentPath, databaseName), runAsync)
 
-    fun connect(file: File, runAsync: Boolean) {
+    override fun connect(file: File, runAsync: Boolean) {
         runAsyncIf(runAsync) { ConnectionHandler.connect(file) }
     }
 
-    fun disconnect() {
+    override fun disconnect() {
         if (isConnected()) return
 
         connection.close()
     }
 
-    fun isConnected(): Boolean = ConnectionHandler.isConnected()
+    override fun isConnected(): Boolean = ConnectionHandler.isConnected()
 
-    fun <T : Any> runSQL(sql: String, execute: (PreparedStatement) -> T?): T? {
+    override fun <T : Any> runSQL(sql: String, execute: (PreparedStatement) -> T?): T? {
         if (!isConnected()) throw SQLException("The connection is not open")
 
         try {
@@ -44,16 +42,16 @@ class GlobalDatabase<K : Any, V : Any> {
         return null
     }
 
-    fun createTable(clazz: MunchClass<K, V>, runAsync: Boolean) {
+    override fun <K : Any> createTable(clazz: MunchClass<K, *>, runAsync: Boolean) {
         runAsyncIf(runAsync) {
-            val sql = clazz.generateTable()
+            val sql = clazz.tableSQL
             runSQL(sql) { statement -> statement.execute() }
         }
     }
 
-    fun getAllData(clazz: MunchClass<K, V>, runAsync: Boolean): CompletableFuture<List<K>?> {
+    override fun <K : Any> getAllData(clazz: MunchClass<K, *>, runAsync: Boolean): CompletableFuture<List<K>?> {
         return runAsyncIf(runAsync) {
-            val sql = clazz.generateSelectAll()
+            val sql = clazz.selectAllSQL
 
             runSQL(sql) { statement ->
                 val resultSet = statement.executeQuery()
@@ -68,9 +66,13 @@ class GlobalDatabase<K : Any, V : Any> {
         }
     }
 
-    fun hasData(clazz: MunchClass<K, V>, runAsync: Boolean): CompletableFuture<Boolean?> {
+    override fun <K : Any, V : Any> hasData(
+        clazz: MunchClass<K, V>,
+        value: V,
+        runAsync: Boolean
+    ): CompletableFuture<Boolean?> {
         return runAsyncIf(runAsync) {
-            val sql = clazz.generateSelect()
+            val sql = clazz.selectSQL
 
             runSQL(sql) { statement ->
                 setValue(statement, 1, value)
@@ -80,9 +82,9 @@ class GlobalDatabase<K : Any, V : Any> {
         }
     }
 
-    fun addData(clazz: MunchClass<K, V>, obj: K, runAsync: Boolean) {
+    override fun <K : Any> addData(clazz: MunchClass<K, *>, obj: K, runAsync: Boolean) {
         runAsyncIf(runAsync) {
-            val sql = clazz.generateInsert()
+            val sql = clazz.insertSQL
             runSQL(sql) { statement ->
                 addValue(statement, obj)
 
@@ -91,12 +93,12 @@ class GlobalDatabase<K : Any, V : Any> {
         }
     }
 
-    fun addAllData(clazz: MunchClass<K, V>, obj: Array<K>, runAsync: Boolean) =
+    override fun <K : Any> addAllData(clazz: MunchClass<K, *>, obj: Array<K>, runAsync: Boolean) =
         addAllData(clazz, obj.toList(), runAsync)
 
-    fun addAllData(clazz: MunchClass<K, V>, obj: List<K>, runAsync: Boolean) {
+    override fun <K : Any> addAllData(clazz: MunchClass<K, *>, obj: List<K>, runAsync: Boolean) {
         runAsyncIf(runAsync) {
-            val sql = clazz.generateInsert()
+            val sql = clazz.insertSQL
             runSQL(sql) { statement ->
                 for (data in obj) {
                     addValue(statement, data)
@@ -109,9 +111,13 @@ class GlobalDatabase<K : Any, V : Any> {
         }
     }
 
-    fun getData(clazz: MunchClass<K, V>, value: V, runAsync: Boolean): CompletableFuture<K?> {
+    override fun <K : Any, V : Any> getData(
+        clazz: MunchClass<K, V>,
+        value: V,
+        runAsync: Boolean
+    ): CompletableFuture<K?> {
         return runAsyncIf(runAsync) {
-            val sql = clazz.generateSelect()
+            val sql = clazz.selectSQL
             runSQL(sql) { statement ->
                 setValue(statement, 1, value)
 
@@ -123,23 +129,23 @@ class GlobalDatabase<K : Any, V : Any> {
         }
     }
 
-    fun deleteTable(clazz: MunchClass<K, V>, runAsync: Boolean) {
+    override fun <K : Any> deleteTable(clazz: MunchClass<K, *>, runAsync: Boolean) {
         runAsyncIf(runAsync) {
-            val sql = clazz.generateDeleteTable()
+            val sql = clazz.deleteTableSQL
             runSQL(sql) { statement -> statement.execute() }
         }
     }
 
-    fun deleteAllData(clazz: MunchClass<K, V>, runAsync: Boolean) {
+    override fun <K : Any> deleteAllData(clazz: MunchClass<K, *>, runAsync: Boolean) {
         runAsyncIf(runAsync) {
-            val sql = clazz.generateDeleteAll()
+            val sql = clazz.deleteAllSQL
             runSQL(sql) { statement -> statement.execute() }
         }
     }
 
-    fun deleteData(clazz: MunchClass<K, V>, value: V, runAsync: Boolean) {
+    override fun <K : Any, V : Any> deleteData(clazz: MunchClass<K, V>, value: V, runAsync: Boolean) {
         runAsyncIf(runAsync) {
-            val sql = clazz.generateDelete()
+            val sql = clazz.deleteSQL
             runSQL(sql) { statement ->
                 setValue(statement, 1, value)
                 statement.execute()
@@ -147,9 +153,9 @@ class GlobalDatabase<K : Any, V : Any> {
         }
     }
 
-    fun updateData(clazz: MunchClass<K, V>, obj: K, value: V, runAsync: Boolean) {
+    override fun <K : Any, V : Any> updateData(clazz: MunchClass<K, V>, obj: K, value: V, runAsync: Boolean) {
         runAsyncIf(runAsync) {
-            val sql = clazz.generateUpdate()
+            val sql = clazz.updateSQL
             runSQL(sql) { statement ->
                 val columns = clazz.columns.keys.toList()
 
@@ -161,11 +167,12 @@ class GlobalDatabase<K : Any, V : Any> {
         }
     }
 
-    fun updateAllData(clazz: MunchClass<K, V>, obj: Array<K>, runAsync: Boolean) = updateAllData(clazz, obj.toList(), runAsync)
+    override fun <K : Any> updateAllData(clazz: MunchClass<K, *>, obj: Array<K>, runAsync: Boolean) =
+        updateAllData(clazz, obj.toList(), runAsync)
 
-    fun updateAllData(clazz: MunchClass<K, V>, obj: List<K>, runAsync: Boolean) {
+    override fun <K : Any> updateAllData(clazz: MunchClass<K, *>, obj: List<K>, runAsync: Boolean) {
         runAsyncIf(runAsync) {
-            val sql = clazz.generateUpdate()
+            val sql = clazz.updateSQL
             runSQL(sql) { statement ->
                 for (data in obj) {
                     val key = clazz.primaryKey.first.call(data)
