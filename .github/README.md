@@ -14,6 +14,8 @@ Munch is a very optimized API which offers many things at your disposal, which h
 
 Munch also offers lots of features you can use such as
 - Thread Safe
+- Auto Serializers
+- Low Storage Usage
 - Low Performance Cost
 - User-Friendly
 
@@ -29,13 +31,11 @@ Here's an example of creating that data class:
 ```kt
 @Table("TableName") // If the table name isn't set it will default to the data class's name
 data class PlayerData(
-    @PrimaryKey var id: Int,
-    @Column var name: String,
+    @PrimaryKey val id: Int,
+    @Column val name: String,
     @Column(constraints = [ColumnConstraint.NOTNULL]) var level: Int, // This will make the value NOT NULL in the SQLite database
-    @Column(ColumnType.BOOLEAN) var isCool: Boolean, // Column types are types that are offered by SQLite to improve storage. If the column type isn't set it will still work just will use more storage
-) {
-    constructor() : this(0, "", false) // An empty constructor is REQUIRED for Munch to work properly
-}
+    @Column var isCool: Boolean, // Column types are types that are offered by SQLite to improve storage. If the column type isn't set it will still work just will use more storage
+)
 ```
 
 Then to make a database for it you will need to do this:
@@ -47,27 +47,6 @@ fun main() {
     val data = PlayerData(10, "Insavings", true)
     database.addData(clazz, data)
 }
-```
-
- ## 🧑‍💻 Munch Serialization
- Munch offers `Serialization` for your types. This can easily be created by doing:
-```kt
-import me.outspending.munch.serializer.Serializer
-import java.util.*
-
-class UUIDSerializer : Serializer<UUID> {
-    override fun getSerializerClass(): Class<UUID> = UUID::class.java
-
-    override fun deserialize(str: String): UUID = UUID.fromString(str)
-
-    override fun serialize(obj: Any?): String = (obj as UUID).toString()
-}
-```
-You will also need to register that serializer by doing:
-```kt
-SerializerFactory.registerSerializer(UUIDSerializer())
-// OR
-SerializerFactory.registerSerializers("package.name")
 ```
 
 ## Contributers
