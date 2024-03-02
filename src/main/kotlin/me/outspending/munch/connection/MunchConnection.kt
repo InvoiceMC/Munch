@@ -1,9 +1,7 @@
 package me.outspending.munch.connection
 
 import me.outspending.munch.MunchClass
-import me.outspending.munch.serializer.SerializerFactory
-import java.io.File
-import java.io.IOException
+import java.io.*
 import java.lang.reflect.Field
 import java.sql.*
 import java.util.concurrent.CompletableFuture
@@ -192,6 +190,32 @@ interface MunchConnection {
      */
     fun <K : Any, V : Any> getData(clazz: MunchClass<K, V>, value: V, runAsync: Boolean = false): CompletableFuture<K?>
 
+/**
+     * This method is used to get all the data from the database.
+     *
+     * @param clazz The [MunchClass] instance to be used.
+     * @param value The value to be checked.
+     * @return If the data exists in the database.
+     * @throws SQLException If the data cannot be inserted.
+     * @see SQLException
+     * @see MunchClass
+     * @since 1.0.0
+     */
+    fun <K : Any, V : Any> getAllData(clazz: MunchClass<K, V>, value: V, runAsync: Boolean = false): CompletableFuture<List<K?>?>
+
+    /**
+     * This method is used to get all the data from the database.
+     *
+     * @param clazz The [MunchClass] instance to be used.
+     * @param filter The filter to be used.
+     * @return If the data exists in the database.
+     * @throws SQLException If the data cannot be inserted.
+     * @see SQLException
+     * @see MunchClass
+     * @since 1.0.0
+     */
+    fun <K : Any, V : Any> getAllDataWithFilter(clazz: MunchClass<K, V>, filter: (K) -> Boolean, runAsync: Boolean = false): CompletableFuture<List<K?>?>
+
     /**
      * This method is used to delete the whole table inside the database. This is useful for
      * clearing the database.
@@ -295,7 +319,7 @@ interface MunchConnection {
      * @since 1.0.0
      */
     fun setValue(statement: PreparedStatement, index: Int, value: Any) {
-        when (val clazz = value::class) {
+        when (value::class) {
             String::class -> statement.setString(index, value as String)
             Int::class -> statement.setInt(index, value as Int)
             Long::class -> statement.setLong(index, value as Long)
@@ -303,16 +327,21 @@ interface MunchConnection {
             Float::class -> statement.setFloat(index, value as Float)
             Boolean::class -> statement.setBoolean(index, value as Boolean)
             else -> {
-                val serializer = SerializerFactory.getSerializer(clazz as KClass<*>)
-                serializer?.let {
-                    val serializedValue = serializer.serialize(value)
+                // TODO: Not sure if this is performant, but it will work for now...
+                val byteArray = ByteArrayOutputStream().use { byteStream ->
+                    ObjectOutputStream(byteStream).use { objectStream ->
+                        objectStream.writeObject(value)
+                    }
 
-                    statement.setString(index, serializedValue)
+                    byteStream.toByteArray()
                 }
+
+                statement.setBinaryStream(index, ByteArrayInputStream(byteArray), byteArray.size)
             }
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun <T : Any> generateType(clazz: KClass<T>, resultSet: ResultSet): T? {
         val constructor = clazz.primaryConstructor ?: return null
         val parameters = constructor.parameters
@@ -326,9 +355,12 @@ interface MunchConnection {
                     Float::class -> resultSet.getFloat(parameter.name)
                     Boolean::class -> resultSet.getBoolean(parameter.name)
                     else -> {
-                        val serializer =
-                            SerializerFactory.getSerializer(parameter.type.classifier as KClass<*>)
-                        serializer?.deserialize(resultSet.getString(parameter.name))
+                        val blob = resultSet.getBytes(parameter.name)
+
+                        val byteArrayInput = ByteArrayInputStream(blob)
+                        val objectInput = ObjectInputStream(byteArrayInput)
+
+                        objectInput.readObject() as T
                     }
                 }
             }

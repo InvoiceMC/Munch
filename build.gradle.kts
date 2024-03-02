@@ -18,7 +18,7 @@ dependencies {
     implementation("org.xerial:sqlite-jdbc:3.45.1.0")
 
     // Reflections
-    implementation("org.reflections:reflections:0.10.2")
+    implementation("org.reflections:reflections:0.9.8")
 
     // JMH
     jmh("org.openjdk.jmh:jmh-core:0.9")

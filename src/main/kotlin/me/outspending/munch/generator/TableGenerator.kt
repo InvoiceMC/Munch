@@ -76,7 +76,7 @@ class TableGenerator<T : Any, K : Any>(clazz: MunchClass<T, K>) : AllGenerator<T
             Double::class,
             Float::class -> "REAL"
             Boolean::class -> "BOOLEAN"
-            else -> "TEXT"
+            else -> "BLOB"
         }
     }
 }

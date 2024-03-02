@@ -5,6 +5,7 @@ import me.outspending.munch.MunchClass
 import java.io.File
 import java.sql.Connection
 import java.sql.PreparedStatement
+import java.sql.ResultSet
 import java.sql.SQLException
 import java.util.concurrent.CompletableFuture
 
@@ -21,6 +22,16 @@ class GlobalDatabase internal constructor() : MunchConnection {
 
             return instance
         }
+    }
+
+    private fun <K : Any> getData(clazz: MunchClass<K, *>, resultSet: ResultSet, isSingle: Boolean): List<K?> {
+        val list = mutableListOf<K?>()
+        while (resultSet.next()) {
+            list.add(generateType(clazz.clazz, resultSet))
+            if (isSingle) break
+        }
+
+        return list
     }
 
     override fun connect(databaseName: String, runAsync: Boolean) =
@@ -134,9 +145,32 @@ class GlobalDatabase internal constructor() : MunchConnection {
                 setValue(statement, 1, value)
 
                 val resultSet = statement.executeQuery()
-                if (!resultSet.next()) return@runSQL null
+                return@runSQL getData(clazz, resultSet, true).first()
+            }
+        }
+    }
 
-                return@runSQL generateType(clazz.clazz, resultSet)
+    override fun <K : Any, V : Any> getAllDataWithFilter(
+        clazz: MunchClass<K, V>,
+        filter: (K) -> Boolean,
+        runAsync: Boolean
+    ): CompletableFuture<List<K?>?> {
+        val allData = getAllData(clazz, runAsync)
+        return allData.thenApply { it?.filter(filter) }
+    }
+
+    override fun <K : Any, V : Any> getAllData(
+        clazz: MunchClass<K, V>,
+        value: V,
+        runAsync: Boolean
+    ): CompletableFuture<List<K?>?> {
+        return runAsyncIf(runAsync) {
+            val sql = clazz.selectSQL
+            runSQL(sql) { statement ->
+                setValue(statement, 1, value)
+
+                val resultSet = statement.executeQuery()
+                return@runSQL getData(clazz, resultSet, false)
             }
         }
     }
