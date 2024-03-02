@@ -4,7 +4,6 @@ import me.outspending.munch.MunchClass
 import java.io.*
 import java.lang.reflect.Field
 import java.sql.*
-import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.*
@@ -57,7 +56,7 @@ interface MunchConnection {
      * @author Outspending
      * @since 1.0.0
      */
-    fun connect(databaseName: String = "database.db", runAsync: Boolean = false)
+    fun connect(databaseName: String = "database.db")
 
     /**
      * This method is used to connect to the SQLite database.
@@ -68,7 +67,7 @@ interface MunchConnection {
      * @author Outspending
      * @since 1.0.0
      */
-    fun connect(parentPath: File, databaseName: String, runAsync: Boolean = false)
+    fun connect(parentPath: File, databaseName: String)
 
     /**
      * This method is used to connect to the SQLite database.
@@ -79,7 +78,7 @@ interface MunchConnection {
      * @author Outspending
      * @since 1.0.0
      */
-    fun connect(file: File, runAsync: Boolean = false)
+    fun connect(file: File)
 
     /**
      * This method will disconnect the database from Munch. This can be useful if you want to close
@@ -119,7 +118,7 @@ interface MunchConnection {
      * @author Outspending
      * @since 1.0.0
      */
-    fun <K : Any> createTable(clazz: MunchClass<K, *>, runAsync: Boolean = false)
+    fun <K : Any> createTable(clazz: MunchClass<K, *>)
 
     /**
      * This method gets all the data from the database.
@@ -129,7 +128,7 @@ interface MunchConnection {
      * @author Outspending
      * @since 1.0.0
      */
-    fun <K : Any> getAllData(clazz: MunchClass<K, *>, runAsync: Boolean = false): CompletableFuture<List<K>?>
+    fun <K : Any> getAllData(clazz: MunchClass<K, *>): MutableList<K>?
 
     /**
      * This method is used to check if the data exists in the database.
@@ -142,9 +141,8 @@ interface MunchConnection {
      */
     fun <K : Any, V : Any> hasData(
         clazz: MunchClass<K, V>,
-        value: V,
-        runAsync: Boolean = false
-    ): CompletableFuture<Boolean?>
+        value: V
+    ): Boolean?
 
     /**
      * This method is used to insert data into the database.
@@ -154,7 +152,7 @@ interface MunchConnection {
      * @author Outspending
      * @since 1.0.0
      */
-    fun <K : Any> addData(clazz: MunchClass<K, *>, obj: K, runAsync: Boolean = false)
+    fun <K : Any> addData(clazz: MunchClass<K, *>, obj: K)
 
     /**
      * This method is used to insert data into the database.
@@ -166,7 +164,7 @@ interface MunchConnection {
      * @see MunchClass
      * @since 1.0.0
      */
-    fun <K : Any> addAllData(clazz: MunchClass<K, *>, obj: Array<K>, runAsync: Boolean = false)
+    fun <K : Any> addAllData(clazz: MunchClass<K, *>, obj: Array<K>)
 
     /**
      * This method is used to insert data into the database.
@@ -178,7 +176,7 @@ interface MunchConnection {
      * @see MunchClass
      * @since 1.0.0
      */
-    fun <K : Any> addAllData(clazz: MunchClass<K, *>, obj: List<K>, runAsync: Boolean = false)
+    fun <K : Any> addAllData(clazz: MunchClass<K, *>, obj: List<K>)
 
     /**
      * This method is used to insert data into the database.
@@ -188,7 +186,7 @@ interface MunchConnection {
      * @author Outspending
      * @since 1.0.0
      */
-    fun <K : Any, V : Any> getData(clazz: MunchClass<K, V>, value: V, runAsync: Boolean = false): CompletableFuture<K?>
+    fun <K : Any, V : Any> getData(clazz: MunchClass<K, V>, value: V): K?
 
 /**
      * This method is used to get all the data from the database.
@@ -201,7 +199,7 @@ interface MunchConnection {
      * @see MunchClass
      * @since 1.0.0
      */
-    fun <K : Any, V : Any> getAllData(clazz: MunchClass<K, V>, value: V, runAsync: Boolean = false): CompletableFuture<List<K?>?>
+    fun <K : Any, V : Any> getAllData(clazz: MunchClass<K, V>, value: V): MutableList<K>?
 
     /**
      * This method is used to get all the data from the database.
@@ -214,7 +212,7 @@ interface MunchConnection {
      * @see MunchClass
      * @since 1.0.0
      */
-    fun <K : Any, V : Any> getAllDataWithFilter(clazz: MunchClass<K, V>, filter: (K) -> Boolean, runAsync: Boolean = false): CompletableFuture<List<K?>?>
+    fun <K : Any, V : Any> getAllDataWithFilter(clazz: MunchClass<K, V>, filter: (K) -> Boolean): List<K>?
 
     /**
      * This method is used to delete the whole table inside the database. This is useful for
@@ -227,7 +225,7 @@ interface MunchConnection {
      * @author Outspending
      * @since 1.0.0
      */
-    fun <K : Any> deleteTable(clazz: MunchClass<K, *>, runAsync: Boolean = false)
+    fun <K : Any> deleteTable(clazz: MunchClass<K, *>)
 
     /**
      * This method is used to delete all the data from the database.
@@ -238,7 +236,7 @@ interface MunchConnection {
      * @see MunchClass
      * @since 1.0.0
      */
-    fun <K : Any> deleteAllData(clazz: MunchClass<K, *>, runAsync: Boolean = false)
+    fun <K : Any> deleteAllData(clazz: MunchClass<K, *>)
 
     /**
      * This method is used to delete data from the database.
@@ -250,7 +248,7 @@ interface MunchConnection {
      * @see MunchClass
      * @since 1.0.0
      */
-    fun <K : Any, V : Any> deleteData(clazz: MunchClass<K, V>, value: V, runAsync: Boolean = false)
+    fun <K : Any, V : Any> deleteData(clazz: MunchClass<K, V>, value: V)
 
     /**
      * This method is used to update data in the database.
@@ -262,7 +260,7 @@ interface MunchConnection {
      * @see MunchClass
      * @since 1.0.0
      */
-    fun <K : Any, V : Any> updateData(clazz: MunchClass<K, V>, obj: K, value: V, runAsync: Boolean = false)
+    fun <K : Any, V : Any> updateData(clazz: MunchClass<K, V>, obj: K, value: V)
 
     /**
      * This method is used to update data in the database.
@@ -274,7 +272,7 @@ interface MunchConnection {
      * @see MunchClass
      * @since 1.0.0
      */
-    fun <K : Any> updateAllData(clazz: MunchClass<K, *>, obj: Array<K>, runAsync: Boolean = false)
+    fun <K : Any> updateAllData(clazz: MunchClass<K, *>, obj: Array<K>)
 
     /**
      * This method is used to update data in the database.
@@ -286,7 +284,7 @@ interface MunchConnection {
      * @see MunchClass
      * @since 1.0.0
      */
-    fun <K : Any> updateAllData(clazz: MunchClass<K, *>, obj: List<K>, runAsync: Boolean = false)
+    fun <K : Any> updateAllData(clazz: MunchClass<K, *>, obj: List<K>)
 
     fun addValue(statement: PreparedStatement, obj: Any): Int {
         val fields = obj::class.java.declaredFields
