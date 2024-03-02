@@ -24,16 +24,6 @@ class GlobalDatabase internal constructor() : MunchConnection {
         }
     }
 
-    private fun <K : Any> getData(clazz: MunchClass<K, *>, resultSet: ResultSet, isSingle: Boolean): List<K?> {
-        val list = mutableListOf<K?>()
-        while (resultSet.next()) {
-            list.add(generateType(clazz.clazz, resultSet))
-            if (isSingle) break
-        }
-
-        return list
-    }
-
     override fun connect(databaseName: String, runAsync: Boolean) =
         connect(File(databaseName), runAsync)
 
@@ -145,7 +135,9 @@ class GlobalDatabase internal constructor() : MunchConnection {
                 setValue(statement, 1, value)
 
                 val resultSet = statement.executeQuery()
-                return@runSQL getData(clazz, resultSet, true).first()
+                if (!resultSet.next()) return@runSQL null
+
+                return@runSQL generateType(clazz.clazz, resultSet)
             }
         }
     }
@@ -169,8 +161,13 @@ class GlobalDatabase internal constructor() : MunchConnection {
             runSQL(sql) { statement ->
                 setValue(statement, 1, value)
 
+                val list = mutableListOf<K>()
                 val resultSet = statement.executeQuery()
-                return@runSQL getData(clazz, resultSet, false)
+                while (resultSet.next()) {
+                    generateType(clazz.clazz, resultSet)?.let { list.add(it) }
+                }
+
+                return@runSQL list
             }
         }
     }
