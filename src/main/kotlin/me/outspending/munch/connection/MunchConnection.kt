@@ -139,10 +139,7 @@ interface MunchConnection {
      * @author Outspending
      * @since 1.0.0
      */
-    fun <K : Any, V : Any> hasData(
-        clazz: MunchClass<K, V>,
-        value: V
-    ): Boolean?
+    fun <K : Any, V : Any> hasData(clazz: MunchClass<K, V>, value: V): Boolean
 
     /**
      * This method is used to insert data into the database.
@@ -188,7 +185,7 @@ interface MunchConnection {
      */
     fun <K : Any, V : Any> getData(clazz: MunchClass<K, V>, value: V): K?
 
-/**
+    /**
      * This method is used to get all the data from the database.
      *
      * @param clazz The [MunchClass] instance to be used.
@@ -212,7 +209,10 @@ interface MunchConnection {
      * @see MunchClass
      * @since 1.0.0
      */
-    fun <K : Any, V : Any> getAllDataWithFilter(clazz: MunchClass<K, V>, filter: (K) -> Boolean): List<K>?
+    fun <K : Any, V : Any> getAllDataWithFilter(
+        clazz: MunchClass<K, V>,
+        filter: (K) -> Boolean
+    ): List<K>?
 
     /**
      * This method is used to delete the whole table inside the database. This is useful for
@@ -325,14 +325,17 @@ interface MunchConnection {
             Float::class -> statement.setFloat(index, value as Float)
             Boolean::class -> statement.setBoolean(index, value as Boolean)
             else -> {
-                // TODO: Not sure if this is performant, but it will work for now...
-                val byteArray = ByteArrayOutputStream().use { byteStream ->
-                    ObjectOutputStream(byteStream).use { objectStream ->
-                        objectStream.writeObject(value)
-                    }
+                if (!value::class.isSubclassOf(Serializable::class))
+                    throw IllegalArgumentException("The value cannot be serialized")
 
-                    byteStream.toByteArray()
-                }
+                val byteArray =
+                    ByteArrayOutputStream().use { byteStream ->
+                        ObjectOutputStream(byteStream).use { objectStream ->
+                            objectStream.writeObject(value)
+                        }
+
+                        byteStream.toByteArray()
+                    }
 
                 statement.setBinaryStream(index, ByteArrayInputStream(byteArray), byteArray.size)
             }

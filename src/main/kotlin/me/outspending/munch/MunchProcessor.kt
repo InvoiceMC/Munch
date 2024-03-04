@@ -1,6 +1,5 @@
 package me.outspending.munch
 
-import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 
 /**
@@ -35,7 +34,6 @@ class MunchProcessor<K : Any>(val munch: Munch<K>) {
      * @author Outspending
      * @since 1.0
      */
-    @Suppress("UNCHECKED_CAST")
     fun <V : Any> process(): MunchClass<K, V> {
         val primaryKey = getPrimaryKey()
         val columns = getColumns()

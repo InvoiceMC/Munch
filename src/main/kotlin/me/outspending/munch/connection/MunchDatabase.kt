@@ -3,7 +3,6 @@ package me.outspending.munch.connection
 import me.outspending.munch.MunchClass
 import java.io.File
 import java.sql.PreparedStatement
-import java.util.concurrent.CompletableFuture
 
 class MunchDatabase<K : Any, V : Any> internal constructor(private val clazz: MunchClass<K, V>) {
     private val database = GlobalDatabase.getInstance()
@@ -27,7 +26,7 @@ class MunchDatabase<K : Any, V : Any> internal constructor(private val clazz: Mu
     fun getAllData(): MutableList<K>? =
         database.getAllData(clazz)
 
-    fun hasData(value: V): Boolean? =
+    fun hasData(value: V): Boolean =
         database.hasData(clazz, value)
 
     fun addData(obj: K) = database.addData(clazz, obj)

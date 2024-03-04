@@ -73,14 +73,14 @@ class GlobalDatabase internal constructor() : MunchConnection {
     override fun <K : Any, V : Any> hasData(
         clazz: MunchClass<K, V>,
         value: V
-    ): Boolean? {
+    ): Boolean {
         val sql = clazz.selectSQL
 
         return runSQL(sql) { statement ->
             setValue(statement, 1, value)
 
             statement.executeQuery().next()
-        }
+        } ?: false
     }
 
     override fun <K : Any> addData(clazz: MunchClass<K, *>, obj: K) {
