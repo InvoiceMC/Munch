@@ -42,7 +42,7 @@ class MunchDatabase<K : Any, V : Any> internal constructor(private val clazz: Mu
     fun getAllData(value: V): MutableList<K>? =
         database.getAllData(clazz, value)
 
-    fun <K : Any, V : Any> getAllDataWithFilter(clazz: MunchClass<K, V>, filter: (K) -> Boolean): List<K>? =
+    fun getAllDataWithFilter(filter: (K) -> Boolean): List<K>? =
         database.getAllDataWithFilter(clazz, filter)
 
     fun deleteTable() = database.deleteTable(clazz)
