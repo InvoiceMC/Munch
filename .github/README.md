@@ -14,12 +14,14 @@ Munch is a very optimized API which offers many things at your disposal, which h
 
 Munch also offers lots of features you can use such as
 - Thread Safe
-- Auto Serializers
+- Auto Serializers *(Needs to implement `Serializable`)*
 - Low Storage Usage
 - Low Performance Cost
 - User-Friendly
 
 ## ⭐ Adding Munch to Your Project
+[![](https://jitpack.io/v/InvoiceMC/Munch.svg)](https://jitpack.io/#InvoiceMC/Munch)
+
 Check out our jitpack to add **Munch** to your project [HERE](https://jitpack.io/#InvoiceMC/Munch)
 
 ## 🎉 Creating Database
@@ -33,8 +35,8 @@ Here's an example of creating that data class:
 data class PlayerData(
     @PrimaryKey val id: Int,
     @Column val name: String,
-    @Column(constraints = [ColumnConstraint.NOTNULL]) var level: Int, // This will make the value NOT NULL in the SQLite database
-    @Column var isCool: Boolean, // Column types are types that are offered by SQLite to improve storage. If the column type isn't set it will still work just will use more storage
+    @Column(constraints = ColumnConstraint.NOTNULL) var level: Int, // This will make the value NOT NULL in the SQLite database
+    @Column var isCool: Boolean,
 )
 ```
 
