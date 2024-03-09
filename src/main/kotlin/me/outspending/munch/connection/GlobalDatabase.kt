@@ -1,12 +1,20 @@
 package me.outspending.munch.connection
 
 import me.outspending.munch.MunchClass
-import java.io.File
+import me.outspending.munch.MunchSerializer
+import java.io.*
+import java.lang.reflect.Field
 import java.sql.Connection
 import java.sql.PreparedStatement
+import java.sql.ResultSet
 import java.sql.SQLException
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
+import kotlin.reflect.KClass
+import kotlin.reflect.KProperty1
+import kotlin.reflect.full.isSubclassOf
+import kotlin.reflect.full.primaryConstructor
+import kotlin.reflect.jvm.javaField
 
 private val connection: Connection by lazy { ConnectionHandler.getConnection() }
 
@@ -22,6 +30,8 @@ class GlobalDatabase internal constructor() : MunchConnection {
             return instance
         }
     }
+
+    private val serializer = MunchSerializer()
 
     override fun connect(databaseName: String) =
         connect(File(databaseName))
@@ -199,5 +209,77 @@ class GlobalDatabase internal constructor() : MunchConnection {
 
             statement.executeBatch()
         }
+    }
+
+    private fun addValue(statement: PreparedStatement, obj: Any): Int {
+        val fields = obj::class.java.declaredFields
+        addValues(statement, obj, fields.toList())
+
+        return fields.size
+    }
+
+    private fun <T> addKotlinValues(
+        statement: PreparedStatement,
+        obj: Any,
+        fields: List<KProperty1<out T, *>>
+    ) = addValues(statement, obj, fields.map { it.javaField!! })
+
+    private fun addValues(statement: PreparedStatement, obj: Any, fields: List<Field>): Int {
+        for ((index, field) in fields.withIndex()) {
+            field.isAccessible = true
+
+            val value = field[obj]
+            value?.let { setValue(statement, index + 1, it) }
+        }
+
+        return fields.size + 1
+    }
+
+    /**
+     * This method is used to close the connection to the database.
+     *
+     * @author Outspending
+     * @since 1.0.0
+     */
+    private fun setValue(statement: PreparedStatement, index: Int, value: Any) {
+        when (value::class) {
+            String::class -> statement.setString(index, value as String)
+            Int::class -> statement.setInt(index, value as Int)
+            Long::class -> statement.setLong(index, value as Long)
+            Double::class -> statement.setDouble(index, value as Double)
+            Float::class -> statement.setFloat(index, value as Float)
+            Boolean::class -> statement.setBoolean(index, value as Boolean)
+            else -> {
+                if (value is Serializable) {
+                    val byteArray = serializer.serialize(value)
+
+                    statement.setBinaryStream(index, ByteArrayInputStream(byteArray), byteArray.size)
+                } else {
+                    throw IllegalArgumentException("The value cannot be serialized")
+                }
+            }
+        }
+    }
+
+    private fun <T : Any> generateType(clazz: KClass<T>, resultSet: ResultSet): T? {
+        val constructor = clazz.primaryConstructor ?: return null
+        val parameters = constructor.parameters
+        val parameterValues =
+            parameters.associateWith { parameter ->
+                when (parameter.type.classifier) {
+                    String::class -> resultSet.getString(parameter.name)
+                    Int::class -> resultSet.getInt(parameter.name)
+                    Long::class -> resultSet.getLong(parameter.name)
+                    Double::class -> resultSet.getDouble(parameter.name)
+                    Float::class -> resultSet.getFloat(parameter.name)
+                    Boolean::class -> resultSet.getBoolean(parameter.name)
+                    else -> {
+                        val blob = resultSet.getBytes(parameter.name)
+
+                        serializer.deserialize(blob) as T
+                    }
+                }
+            }
+        return constructor.callBy(parameterValues)
     }
 }
