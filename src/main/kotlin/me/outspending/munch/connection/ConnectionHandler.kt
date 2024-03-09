@@ -12,7 +12,7 @@ import java.sql.SQLException
  * @author Outspending
  * @since 1.0.0
  */
-object ConnectionHandler {
+internal object ConnectionHandler {
     private lateinit var connection: Connection
 
     /**
