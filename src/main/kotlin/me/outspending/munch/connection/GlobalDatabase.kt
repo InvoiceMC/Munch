@@ -5,6 +5,8 @@ import java.io.File
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.SQLException
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 private val connection: Connection by lazy { ConnectionHandler.getConnection() }
 

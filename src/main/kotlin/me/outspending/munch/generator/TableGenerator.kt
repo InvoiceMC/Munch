@@ -50,7 +50,7 @@ class TableGenerator<T : Any, K : Any>(clazz: MunchClass<T, K>) : AllGenerator<T
 
     override fun handleColumn(property: KProperty1<out T, *>, column: Column) {
         val columnType: ColumnType = column.columnType
-        val constraints: Array<ColumnConstraint> = column.constraints
+        val constraints: Array<out ColumnConstraint> = column.constraints
 
         val classifier = property.returnType.classifier as KClass<*>
         appendColumns(
@@ -60,7 +60,7 @@ class TableGenerator<T : Any, K : Any>(clazz: MunchClass<T, K>) : AllGenerator<T
         )
     }
 
-    private fun appendColumns(name: String, type: String, constraints: Array<ColumnConstraint>) {
+    private fun appendColumns(name: String, type: String, constraints: Array<out ColumnConstraint>) {
         builder.apply {
             append(", $name $type")
             constraints.forEach { constraint -> append(" ${constraint.value}") }

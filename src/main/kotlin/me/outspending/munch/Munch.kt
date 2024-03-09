@@ -1,6 +1,7 @@
 package me.outspending.munch
 
 import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.memberProperties
@@ -56,7 +57,6 @@ class Munch<K : Any> private constructor(private val clazz: KClass<K>) {
      * @see Generator
      * @since 1.0.0
      */
-    @OptIn(ExperimentalContracts::class)
     fun <V : Any> process(): MunchClass<K, V> {
         require(isSQLType() && clazz.isData) {
             "The class must be a data class and have the Table annotation"

@@ -51,5 +51,5 @@ annotation class PrimaryKey(
 @Retention(AnnotationRetention.RUNTIME)
 annotation class Column(
     val columnType: ColumnType = ColumnType.NONE,
-    val constraints: Array<ColumnConstraint> = []
+    vararg val constraints: ColumnConstraint = []
 )
