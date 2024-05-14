@@ -276,7 +276,11 @@ class GlobalDatabase internal constructor() : MunchConnection {
                     else -> {
                         val blob = resultSet.getBytes(parameter.name)
 
-                        serializer.deserialize(blob) as T
+                        if (blob == null) {
+                            null
+                        } else {
+                            serializer.deserialize(blob) as T
+                        }
                     }
                 }
             }
