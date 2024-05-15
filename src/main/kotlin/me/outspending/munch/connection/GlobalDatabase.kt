@@ -8,6 +8,7 @@ import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLException
+import java.util.UUID
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.reflect.KClass
@@ -249,13 +250,14 @@ class GlobalDatabase internal constructor() : MunchConnection {
             Double::class -> statement.setDouble(index, value as Double)
             Float::class -> statement.setFloat(index, value as Float)
             Boolean::class -> statement.setBoolean(index, value as Boolean)
+            UUID::class -> statement.setString(index, value.toString())
             else -> {
                 if (value is Serializable) {
                     val byteArray = serializer.serialize(value)
 
                     statement.setBinaryStream(index, ByteArrayInputStream(byteArray), byteArray.size)
                 } else {
-                    throw IllegalArgumentException("The value cannot be serialized")
+                    throw IllegalArgumentException("The value `${value::class.simpleName ?: "unknown"}` cannot be serialized")
                 }
             }
         }
@@ -273,6 +275,7 @@ class GlobalDatabase internal constructor() : MunchConnection {
                     Double::class -> resultSet.getDouble(parameter.name)
                     Float::class -> resultSet.getFloat(parameter.name)
                     Boolean::class -> resultSet.getBoolean(parameter.name)
+                    UUID::class -> UUID.fromString(resultSet.getString(parameter.name))
                     else -> {
                         val blob = resultSet.getBytes(parameter.name)
 
